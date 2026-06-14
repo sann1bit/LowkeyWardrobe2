@@ -1,12 +1,9 @@
 import { Router, type IRouter, type Request, type Response } from "express";
-import { getUploadSignedUrl } from "../lib/supabaseStorage";
+import { ObjectStorageService } from "../lib/objectStorage";
 
 const router: IRouter = Router();
+const objectStorage = new ObjectStorageService();
 
-/**
- * POST /storage/uploads/request-url
- * Returns a Supabase signed upload URL + the final public URL.
- */
 router.post("/storage/uploads/request-url", async (req: Request, res: Response) => {
   const { name, size, contentType } = req.body ?? {};
   if (typeof name !== "string" || typeof size !== "number" || typeof contentType !== "string") {
@@ -15,8 +12,8 @@ router.post("/storage/uploads/request-url", async (req: Request, res: Response) 
   }
 
   try {
-    const { uploadURL, objectPath, publicUrl } = await getUploadSignedUrl(contentType);
-    res.json({ uploadURL, objectPath, publicUrl, metadata: { name, size, contentType } });
+    const uploadURL = await objectStorage.getObjectEntityUploadURL();
+    res.json({ uploadURL, metadata: { name, size, contentType } });
   } catch (error) {
     req.log.error({ err: error }, "Error generating upload URL");
     res.status(500).json({ error: "Failed to generate upload URL" });
