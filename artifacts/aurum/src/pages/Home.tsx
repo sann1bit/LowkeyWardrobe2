@@ -102,17 +102,27 @@ export default function Home() {
           onClick={() => setLocation('/products?category=clothing')}
           className="group cursor-pointer relative md:col-span-2 min-h-[520px] bg-white flex flex-col p-10 lg:p-14 overflow-hidden"
         >
+          {/* Background image — right half */}
+          <img
+            src="/category-clothing.png"
+            alt=""
+            className="absolute inset-y-0 right-0 h-full w-[58%] object-cover object-center opacity-90 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
+            draggable={false}
+          />
+          {/* Gradient: white (left) → transparent (right) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none" />
+
           {/* Top animated line */}
           <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
 
           {/* Editorial header */}
-          <div className="flex items-center justify-between mb-auto">
+          <div className="relative z-10 flex items-center justify-between mb-auto">
             <span className="font-serif text-[11px] italic text-black/20 tracking-[0.05em]">01</span>
             <span className="text-[9px] uppercase tracking-[0.4em] text-black/25 font-light">Clothing</span>
           </div>
 
           {/* Large serif title */}
-          <div className="flex-1 flex flex-col justify-center py-8">
+          <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
             <div className="h-[1px] bg-black/8 mb-10 w-full" />
             <h2 className="font-serif text-[clamp(60px,7vw,108px)] italic font-light leading-[0.92] tracking-[-0.02em] text-black group-hover:translate-x-1.5 transition-transform duration-700 ease-out">
               Clothing
@@ -121,7 +131,7 @@ export default function Home() {
           </div>
 
           {/* Bottom */}
-          <div className="flex items-end justify-between mt-auto">
+          <div className="relative z-10 flex items-end justify-between mt-auto">
             <div>
               <p className="text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3 font-light">
                 Menswear · Womenswear · Unisex
@@ -142,14 +152,24 @@ export default function Home() {
           onClick={() => setLocation('/products?category=shoes')}
           className="group cursor-pointer relative min-h-[520px] bg-[#0a0a0a] flex flex-col p-10 lg:p-12 overflow-hidden"
         >
+          {/* Background image — full cover */}
+          <img
+            src="/category-shoes.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-55 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
+            draggable={false}
+          />
+          {/* Dark overlay: stronger at bottom for text */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20 pointer-events-none" />
+
           <div className="absolute top-0 left-0 h-[1px] bg-white w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
 
-          <div className="flex items-center justify-between mb-auto">
+          <div className="relative z-10 flex items-center justify-between mb-auto">
             <span className="font-serif text-[11px] italic text-white/20 tracking-[0.05em]">02</span>
             <span className="text-[9px] uppercase tracking-[0.4em] text-white/25 font-light">Shoes</span>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center py-8">
+          <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
             <div className="h-[1px] bg-white/8 mb-10 w-full" />
             <h2 className="font-serif text-[clamp(60px,5vw,90px)] italic font-light leading-[0.92] tracking-[-0.02em] text-white group-hover:translate-x-1.5 transition-transform duration-700 ease-out">
               Shoes
@@ -157,7 +177,7 @@ export default function Home() {
             <div className="h-[1px] bg-white/8 mt-10 w-full" />
           </div>
 
-          <div className="flex items-end justify-between mt-auto">
+          <div className="relative z-10 flex items-end justify-between mt-auto">
             <div>
               <p className="text-[9px] uppercase tracking-[0.3em] text-white/25 mb-3 font-light">
                 Menswear · Womenswear · Unisex
@@ -177,14 +197,24 @@ export default function Home() {
           onClick={() => setLocation('/products?category=accessories')}
           className="group cursor-pointer relative min-h-[520px] bg-[#F4F4F4] flex flex-col p-10 lg:p-12 overflow-hidden"
         >
+          {/* Background image — right portion */}
+          <img
+            src="/category-accessories.png"
+            alt=""
+            className="absolute inset-y-0 right-0 h-full w-[65%] object-cover object-center opacity-85 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
+            draggable={false}
+          />
+          {/* Gradient: #F4F4F4 (left) → transparent */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#F4F4F4] via-[#F4F4F4]/85 to-transparent pointer-events-none" />
+
           <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
 
-          <div className="flex items-center justify-between mb-auto">
+          <div className="relative z-10 flex items-center justify-between mb-auto">
             <span className="font-serif text-[11px] italic text-black/20 tracking-[0.05em]">03</span>
             <span className="text-[9px] uppercase tracking-[0.4em] text-black/25 font-light">Accessories</span>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center py-8">
+          <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
             <div className="h-[1px] bg-black/8 mb-10 w-full" />
             <h2 className="font-serif text-[clamp(40px,4vw,68px)] italic font-light leading-[0.92] tracking-[-0.02em] text-black group-hover:translate-x-1.5 transition-transform duration-700 ease-out">
               Acces&shy;sories
@@ -192,7 +222,7 @@ export default function Home() {
             <div className="h-[1px] bg-black/8 mt-10 w-full" />
           </div>
 
-          <div className="flex items-end justify-between mt-auto">
+          <div className="relative z-10 flex items-end justify-between mt-auto">
             <div>
               <p className="text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3 font-light">
                 Menswear · Womenswear · Unisex

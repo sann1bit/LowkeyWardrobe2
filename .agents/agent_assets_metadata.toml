@@ -18,3 +18,21 @@ id = "S9hbxbXiP9FqO34q_Ea9v"
 uri = "file://artifacts/aurum/public/hero-3.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "pH7Wu2sqnArPvOaK53ZRa"
+uri = "file://artifacts/aurum/public/category-clothing.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "rkiVH5FwUJadXjCrU7bBv"
+uri = "file://artifacts/aurum/public/category-shoes.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Ukdds_mZNVSLxGHQHD3rw"
+uri = "file://artifacts/aurum/public/category-accessories.png"
+type = "image"
+title = "generated_image"
