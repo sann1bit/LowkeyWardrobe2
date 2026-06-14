@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "hgDwqGfJcp-PvpzYQve-P"
+uri = "file://artifacts/aurum/public/hero-1.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ufFDVxK7uAgHmf5qDhZF-"
+uri = "file://artifacts/aurum/public/hero-2.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "S9hbxbXiP9FqO34q_Ea9v"
+uri = "file://artifacts/aurum/public/hero-3.png"
+type = "image"
+title = "generated_image"

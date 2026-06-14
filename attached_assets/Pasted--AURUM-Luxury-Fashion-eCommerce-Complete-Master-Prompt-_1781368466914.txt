@@ -1,0 +1,1836 @@
+# AURUM — Luxury Fashion eCommerce: Complete Master Prompt
+# Copy & paste this entire prompt into Claude Code (terminal or VS Code extension)
+# This builds the EXACT same website — pixel-for-pixel, feature-for-feature
+
+---
+
+## MASTER INSTRUCTION
+
+Build a complete, production-ready luxury fashion eCommerce website called **AURUM**. This is a black-and-white minimalist editorial fashion brand — think Zara × COS × Prada × Saint Laurent × Apple design language. Every single detail below is exact and non-negotiable. Do not substitute fonts, colors, products, or layouts. Build exactly what is specified.
+
+---
+
+## TECH STACK (exact versions)
+
+```
+Frontend:     Next.js 15 (App Router)
+Language:     TypeScript (strict mode)
+Styling:      Tailwind CSS v3 + custom CSS variables
+UI Library:   Shadcn/UI
+Animations:   Framer Motion
+Icons:        Lucide React
+Fonts:        Google Fonts — Cormorant Garamond + Inter
+Backend:      Supabase (PostgreSQL + Auth + Storage + Edge Functions)
+Payments:     Stripe (Checkout + Webhooks)
+Deployment:   Vercel
+State:        Zustand (cart, wishlist, UI state)
+Forms:        React Hook Form + Zod validation
+Email:        Resend (transactional emails)
+SEO:          Next.js Metadata API (dynamic)
+Images:       Next/Image with Supabase Storage CDN
+```
+
+---
+
+## DESIGN SYSTEM — EXACT SPECIFICATIONS
+
+### Color Palette (zero deviation allowed)
+```css
+:root {
+  --black:        #000000;
+  --white:        #FFFFFF;
+  --off-white:    #F5F5F5;
+  --light-gray:   #EAEAEA;
+  --mid-gray:     #999999;
+  --dark-gray:    #333333;
+}
+/* NO other colors exist in this project except #C41E1E for sale badges only */
+```
+
+### Typography (exact)
+```css
+/* Display / Editorial headings */
+font-family: 'Cormorant Garamond', Georgia, serif;
+/* weights used: 300 (light), 400 (regular), 500 (medium), 600 (semibold) */
+/* styles used: normal + italic */
+
+/* Body / UI / Labels */
+font-family: 'Inter', system-ui, sans-serif;
+/* weights used: 300 (light), 400 (regular), 500 (medium) */
+/* NO bold (600+) anywhere in the UI */
+
+/* Google Fonts import string (exact) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+```
+
+### Spacing System
+```
+Base unit: 8px
+Scale: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 100, 120px
+Nav height: 64px (56px on mobile)
+Max content width: 1400px
+Container padding: 40px (20px on mobile)
+Grid gaps between cards: 2px (tight luxury grid — NOT regular gap)
+```
+
+### Typography Scale
+```css
+/* Hero title */
+font-size: clamp(52px, 5.5vw, 84px); line-height: 1.05; font-weight: 300; font-style: italic;
+
+/* Section title */
+font-size: clamp(36px, 4vw, 56px); line-height: 1.15; font-weight: 300; font-style: italic;
+
+/* Category card name */
+font-size: 28px; font-weight: 300; font-style: italic;
+
+/* Product name */
+font-size: 14px; font-weight: 400;
+
+/* All labels / eyebrows / nav links */
+font-size: 10–11px; letter-spacing: 0.15–0.3em; text-transform: uppercase; font-weight: 400;
+
+/* Body text */
+font-size: 13–14px; line-height: 1.8; font-weight: 300;
+```
+
+### Animations (Framer Motion — exact easing)
+```js
+const trans = { ease: [0.4, 0, 0.2, 1], duration: 0.8 }
+const fastTrans = { ease: [0.4, 0, 0.2, 1], duration: 0.3 }
+
+// Fade up (used for all section entries)
+initial: { opacity: 0, y: 32 }
+animate: { opacity: 1, y: 0 }
+transition: { ...trans }
+
+// Stagger children
+staggerChildren: 0.15
+
+// Product image hover zoom
+whileHover: { scale: 1.06 } transition: { duration: 0.7, ease: [0.4,0,0.2,1] }
+
+// Nav link underline: width 0→100% on hover, 0.3s ease
+
+// Marquee: CSS animation, 20s linear infinite
+
+// Cart drawer: x: 420→0, 0.4s cubic-bezier(0.4,0,0.2,1)
+
+// Modal: opacity 0→1, 0.3s
+
+// Scroll-triggered: IntersectionObserver, threshold 0.1, rootMargin "0px 0px -40px 0px"
+
+// Hero entry animations (staggered):
+// eyebrow: delay 0.2s
+// title: delay 0.4s  
+// subtitle: delay 0.6s
+// CTA buttons: delay 0.8s
+// scroll indicator: delay 1.2s
+```
+
+---
+
+## BRAND IDENTITY
+
+```
+Brand Name:    AURUM
+Tagline:       "Luxury fashion rooted in timeless craft."
+Sub-tagline:   "Designed for those who seek quality without compromise."
+Season label:  SS26 Collection / Autumn Winter 2026
+Hero headline: "Discover your Signature Style"
+Hero sub:      "Meticulously crafted for those who understand that true luxury lies
+                in the details. Timeless pieces that transcend seasons."
+```
+
+---
+
+## SITE ARCHITECTURE
+
+```
+/ (Home)
+  ├── Sticky Navbar
+  ├── Hero Section (full viewport)
+  ├── Marquee Bar
+  ├── Categories Section
+  ├── New Arrivals (product grid)
+  ├── Editorial Feature Section
+  ├── Featured Brands Strip
+  ├── Features/USPs Grid
+  ├── Newsletter Section
+  └── Footer
+
+/products (All products)
+/products/[slug] (Product detail page)
+/category/[slug] (Category page)
+/search (Search results)
+/cart (Cart page — also slide-out drawer)
+/checkout (Multi-step: shipping → delivery → payment → review)
+/account (Dashboard)
+/account/orders
+/account/wishlist
+/account/profile
+/account/addresses
+/auth/login
+/auth/register
+/auth/forgot-password
+/auth/reset-password
+/admin (Admin dashboard — role-protected)
+/admin/products
+/admin/orders
+/admin/customers
+/admin/inventory
+/admin/content
+```
+
+---
+
+## SECTION-BY-SECTION BUILD SPECS
+
+### 1. NAVBAR (sticky, `position: fixed; top: 0; z-index: 1000`)
+
+```
+Layout:    3-column flex: [Logo] [Nav Links] [Action Icons]
+Height:    64px
+BG:        rgba(255,255,255,0.96) + backdrop-filter: blur(12px)
+Border:    border-bottom: 1px solid #EAEAEA
+Max-width: 1400px centered, padding: 0 40px
+
+Logo:
+  Text: "AURUM"
+  Font: Cormorant Garamond, 22px, weight 500, letter-spacing 0.18em
+  Color: #000
+
+Nav Links (desktop, hidden on mobile < 768px):
+  New Arrivals | Clothing | Shoes | Accessories | Sale
+  "Sale" is color #C41E1E
+  Font: Inter, 11px, weight 400, letter-spacing 0.15em, uppercase
+  Hover: opacity 0.7 + underline animation (::after pseudo, width 0→100%, 0.3s ease)
+  Gap between links: 36px
+
+Action Icons (right side, gap: 20px):
+  1. Search icon (⌕ or magnifying glass SVG)
+  2. Wishlist: "♡ [count]" — count updates live
+  3. Cart: bag icon + black badge showing item count (position: absolute top-right)
+  4. Account: circle/user icon
+  All icons: opacity 0.8, hover opacity 1, font-size ~16px
+  Cart badge: 16×16px circle, background #000, color #fff, font-size 9px
+```
+
+### 2. HERO SECTION (100vh, grid 1fr 1fr)
+
+```
+Height:     100vh, min-height 700px
+Layout:     CSS Grid, grid-template-columns: 1fr 1fr
+Padding-top: 64px (nav height)
+
+LEFT COLUMN (content):
+  Padding: 80px 60px 80px 80px
+  Max-width of content: 680px
+  Vertical alignment: center
+
+  Eyebrow: "SS26 Collection"
+    Font: Inter, 11px, weight 400, letter-spacing 0.25em, uppercase, color #999
+    Margin-bottom: 32px
+    Animation: fadeUp, delay 0.2s
+
+  H1 Title: two lines
+    Line 1 (italic): "Discover your"
+    Line 2 (strong, not italic): "Signature Style"
+    Font: Cormorant Garamond, clamp(52px,5.5vw,84px), weight 300/500
+    Line-height: 1.05
+    Margin-bottom: 32px
+    Animation: fadeUp, delay 0.4s
+
+  Paragraph:
+    "Meticulously crafted for those who understand that true luxury lies
+    in the details. Timeless pieces that transcend seasons."
+    Font: Inter, 14px, weight 300, line-height 1.8, color #333
+    Max-width: 380px
+    Margin-bottom: 48px
+    Animation: fadeUp, delay 0.6s
+
+  Two CTA Buttons (flex row, gap 16px):
+    Button 1 "Shop Collection" — FILLED
+      BG: #000, Color: #fff, Border: 1px solid #000
+      Hover: BG #fff, Color #000
+      Padding: 14px 32px, Font: Inter 11px uppercase letter-spacing 0.15em weight 400
+
+    Button 2 "Explore Looks" — OUTLINE
+      BG: transparent, Color: #000, Border: 1px solid #000
+      Hover: BG #000, Color #fff
+      Same padding/font as above
+    
+    Animation: fadeUp, delay 0.8s
+
+RIGHT COLUMN (editorial image area):
+  BG: linear-gradient(160deg, #f0ede8 0%, #e8e2d9 40%, #ddd6c8 100%)
+  Overflow: hidden
+  Position: relative
+
+  FASHION ILLUSTRATION (SVG, inline):
+    ViewBox: 0 0 400 700
+    Width: 55%, positioned absolute, bottom: 0, right: 8%, opacity: 0.85
+
+    SVG contains a detailed fashion figure illustration:
+    
+    Gradients defined:
+      figGrad: #c4b89a → #a8987a → #8c7f61 (skin/neutral tone, diagonal)
+      coatGrad: #2a2a2a → #111 (vertical, dark coat)
+      pantsGrad: #1a1a1a → #0a0a0a (vertical, very dark pants)
+
+    Elements (bottom to top):
+      - Legs: two rect elements, x=145 w=44 h=260 and x=211 w=44 h=260, rx=2, fill pantsGrad
+      - Shoes: two ellipses at cx=167,233 cy=680, rx=28 ry=10, fill #0a0a0a
+      - Torso/coat: path with clip creating coat shape, fill coatGrad
+        path: "M110 210 Q100 260 96 340 L100 440 H300 L304 340 Q300 260 290 210 L240 180 L200 195 L160 180 Z"
+      - Coat lapels: diamond path centered at 200,240
+        "M200 195 L175 240 L200 270 L225 240 Z" fill #1a1a1a
+      - Left lapel flap: "M175 240 L160 295 L140 290 L150 245 Z" fill #222
+      - Right lapel flap: "M225 240 L240 295 L260 290 L250 245 Z" fill #222
+      - Center button line: line x1=200 y1=270 x2=200 y2=430, stroke #333 sw=1.5
+      - 3 buttons: circles at cx=200 cy=310,350,390, r=4, fill #333
+      - Left arm: path "M110 215 Q70 250 65 350 Q72 370 85 360 Q100 290 130 250 Z" fill #1e1e1e
+      - Right arm: path "M290 215 Q330 250 335 350 Q328 370 315 360 Q300 290 270 250 Z" fill #1e1e1e
+      - Left hand: ellipse cx=75 cy=362 rx=14 ry=10, fill figGrad
+      - Right hand: ellipse cx=325 cy=362 rx=14 ry=10, fill figGrad
+      - Neck: rect x=188 y=155 w=24 h=58 rx=12, fill figGrad
+      - Head: ellipse cx=200 cy=120 rx=46 ry=55, fill figGrad
+      - Hair: path "M154 100 Q155 55 200 50 Q245 55 246 100 Q240 68 200 65 Q160 68 154 100 Z" fill #2a1f14
+      - Left ear: ellipse cx=154 cy=118 rx=8 ry=12, fill #b8a880
+      - Left eye: ellipse cx=185 cy=115 rx=3 ry=4, fill #4a3728, opacity 0.7
+      - Right eye: ellipse cx=215 cy=115 rx=3 ry=4, fill #4a3728, opacity 0.7
+      - Mouth: path "M190 135 Q200 140 210 135" stroke #4a3728 sw=1.5 fill none rounded opacity 0.6
+
+  Decorative text overlays:
+    - "SS 2026" — top-left of image, 11px, letter-spacing 0.25em, uppercase, color #8a7e6a, opacity 0.5
+    - "Editorial Collection" — bottom-left, writing-mode: vertical-rl, Cormorant Garamond, 13px italic, color #8a7e6a, opacity 0.4
+    - Thin vertical line — right edge center, 1px wide, 100px tall, semi-transparent gradient
+
+  Badge overlay: "New Collection · 2026"
+    Position: absolute top=40px left=40px
+    Font: Inter 10px, letter-spacing 0.2em, uppercase, color #999
+    Border: 1px solid #EAEAEA
+    Padding: 10px 18px
+    BG: rgba(255,255,255,0.8), backdrop-filter blur(8px)
+```
+
+### 3. MARQUEE BAR
+
+```
+BG: #000000
+Color: #FFFFFF
+Padding: 14px 0
+Font: Inter, 11px, weight 300, letter-spacing 0.2em, uppercase
+Overflow: hidden
+
+Content (repeats twice for seamless loop):
+  "Free shipping on orders over $250"  ·  "Complimentary gift wrapping"  ·
+  "SS26 Collection — Now Available"  ·  "30-day returns"  ·  "Exclusive member benefits"  ·
+
+Animation: @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+Duration: 20s linear infinite
+```
+
+### 4. CATEGORIES SECTION
+
+```
+Section padding: 100px 0
+Container max-width: 1400px
+
+Title area:
+  Label: "Browse" (10px, letter-spacing 0.3em, uppercase, color #999)
+  H2: italic "Shop by" + strong "Category" (Cormorant Garamond, clamp(36px,4vw,56px))
+
+Grid: CSS Grid, grid-template-columns: repeat(4, 1fr), gap: 2px
+
+CARD 1 — Clothing (spans 2 columns: grid-column: span 2, min-height: 500px)
+  BG: linear-gradient(135deg, #e8e0d5 0%, #d5c9b8 40%, #c2b49e 100%)
+  SVG illustration: torso/coat shape in #8a7c6a at 70%, bottom-right, opacity 0.5
+  Overlay: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15), transparent)
+  Name: "Clothing", Count: "124 pieces"
+  Click: filter products to 'clothing'
+
+CARD 2 — Shoes (normal cell, aspect-ratio 3/4)
+  BG: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) — DARK
+  SVG: shoe/sneaker silhouette in #d4c9b5, opacity 0.4
+  Overlay: rgba(0,0,0,0.7)→transparent from bottom
+  Name: "Shoes", Count: "86 pairs"
+
+CARD 3 — Accessories (normal cell)
+  BG: linear-gradient(135deg, #f0ebe3 0%, #e0d8cc 100%)
+  SVG: minimalist watch face (circle, hands), #6a5e4e, opacity 0.4
+  Name: "Accessories", Count: "58 items"
+
+CARD 4 — Sale (normal cell, background #000000)
+  BG: pure black
+  Ghost text: "SALE" in Cormorant Garamond 72px italic, rgba(255,255,255,0.06)
+  Name: "Sale", subtext: "Up to 60% off", Count: "42 items"
+  All text color: #FFFFFF
+
+All cards:
+  overflow: hidden
+  cursor: pointer
+  position: relative
+  
+  Hover effect:
+    Inner bg div: transform scale(1.05), transition 0.7s cubic-bezier(0.4,0,0.2,1)
+  
+  Arrow "→" button:
+    position: absolute top=24px right=24px
+    36×36px, border: 1px solid rgba(255,255,255,0.3)
+    display: flex, align center
+    opacity: 0, transform translateY(8px) initially
+    On card hover → opacity 1, translateY(0), transition 0.3s
+```
+
+### 5. NEW ARRIVALS — PRODUCT GRID
+
+```
+Section: padding-top 0 (connects to categories)
+Container: max-width 1400px
+
+Header row (flex, space-between, align flex-end):
+  Left: Label "Latest" + H2 italic "New" + strong "Arrivals"
+  Right: Tab row (border-bottom: 1px solid #EAEAEA)
+
+Tabs: All | Clothing | Shoes | Accessories
+  Font: Inter 11px, letter-spacing 0.15em, uppercase, color #999
+  Active tab: color #000 + ::after bottom border 1px #000
+  Padding: 12px 24px
+  Transition: 0.3s
+
+Product Grid:
+  grid-template-columns: repeat(4, 1fr)
+  gap: 2px
+  (responsive: 3 cols at 1024px, 2 cols at 768px)
+
+"View All Products" button: outline style, centered below grid
+```
+
+---
+
+## COMPLETE PRODUCT CATALOG (12 products — exact data)
+
+Each product needs this exact data structure:
+
+```typescript
+interface Product {
+  id: number
+  slug: string
+  name: string
+  brand: string
+  price: number
+  originalPrice?: number   // only for sale items
+  category: 'clothing' | 'shoes' | 'accessories'
+  badge: 'new' | 'sale' | null
+  colors: string[]         // hex values
+  sizes: string[]
+  description: string
+  figType: string          // which SVG figure to render
+  bgGradient: string       // CSS gradient for product card bg
+  figColorA: string        // lighter figure color
+  figColorB: string        // darker figure color
+  sku: string
+  stock: number
+  tags: string[]
+}
+```
+
+### Product 1: Premium Oversized Jacket
+```
+id: 1, slug: 'premium-oversized-jacket'
+name: "Premium Oversized Jacket"
+brand: "Aurum Essentials"
+price: 395
+originalPrice: undefined
+category: "clothing"
+badge: "new"
+colors: ['#1a1a1a', '#d4c9b5', '#8b7355']
+sizes: ['XS', 'S', 'M', 'L', 'XL']
+description: "A meticulously tailored oversized jacket in premium wool blend. Featuring 
+clean lines, subtle lapels, and an impeccable drape that defines effortless luxury."
+figType: "coat"
+bgGradient: "linear-gradient(135deg, #e8e4de, #d4cec5)"
+figColorA: "#c9bfb0"
+figColorB: "#1e1e1e"
+sku: "AUR-0001"
+stock: 24
+tags: ['jacket', 'outerwear', 'oversized', 'wool', 'luxury']
+```
+
+### Product 2: Minimal White Sneaker
+```
+id: 2, slug: 'minimal-white-sneaker'
+name: "Minimal White Sneaker"
+brand: "Aurum Sport"
+price: 285
+originalPrice: undefined
+category: "shoes"
+badge: "new"
+colors: ['#ffffff', '#1a1a1a']
+sizes: ['38', '39', '40', '41', '42', '43', '44']
+description: "The perfect minimalist sneaker. Hand-finished Italian leather upper with a 
+vulcanized sole. A wardrobe cornerstone that complements everything."
+figType: "sneaker"
+bgGradient: "linear-gradient(135deg, #f5f3f0, #e8e4dd)"
+figColorA: "#f0ede8"
+figColorB: "#e8e4dc"
+sku: "AUR-0002"
+stock: 42
+tags: ['sneaker', 'white', 'leather', 'minimal', 'sport']
+```
+
+### Product 3: Cashmere Blend Hoodie
+```
+id: 3, slug: 'cashmere-blend-hoodie'
+name: "Cashmere Blend Hoodie"
+brand: "Aurum Essentials"
+price: 320
+originalPrice: undefined
+category: "clothing"
+badge: null
+colors: ['#8b7355', '#1a1a1a', '#6b6b6b']
+sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+description: "Pure luxury in casual form. Crafted from a superfine cashmere blend that 
+becomes softer with every wear. An investment in everyday comfort."
+figType: "hoodie"
+bgGradient: "linear-gradient(135deg, #ddd0bf, #c8b9a5)"
+figColorA: "#b8a882"
+figColorB: "#a8987a"
+sku: "AUR-0003"
+stock: 18
+tags: ['hoodie', 'cashmere', 'luxury', 'essentials', 'comfort']
+```
+
+### Product 4: Slim Leather Wallet
+```
+id: 4, slug: 'slim-leather-wallet'
+name: "Slim Leather Wallet"
+brand: "Aurum Leather"
+price: 165
+originalPrice: undefined
+category: "accessories"
+badge: "new"
+colors: ['#1a1a1a', '#5c3d2e']
+sizes: ['One Size']
+description: "Handcrafted from full-grain Italian leather. A slim profile holds everything 
+you need with nothing you don't. Develops a rich patina over time."
+figType: "wallet"
+bgGradient: "linear-gradient(135deg, #3d2b1f, #2a1f15)"
+figColorA: "#5c3d2e"
+figColorB: "#4a2e22"
+sku: "AUR-0004"
+stock: 56
+tags: ['wallet', 'leather', 'slim', 'accessories', 'italian']
+```
+
+### Product 5: Tailored Wool Trousers
+```
+id: 5, slug: 'tailored-wool-trousers'
+name: "Tailored Wool Trousers"
+brand: "Aurum Studio"
+price: 445
+originalPrice: undefined
+category: "clothing"
+badge: null
+colors: ['#1a1a1a', '#4a4a4a', '#8b7355']
+sizes: ['28', '30', '32', '34', '36']
+description: "Cut from 120s Italian wool, these trousers define understated elegance. 
+The perfect break, the perfect rise — tailored to perfection."
+figType: "pants"
+bgGradient: "linear-gradient(135deg, #c8cdd4, #a8adb4)"
+figColorA: "#4a4a54"
+figColorB: "#3a3a44"
+sku: "AUR-0005"
+stock: 12
+tags: ['trousers', 'wool', 'tailored', 'formal', 'studio']
+```
+
+### Product 6: Premium Leather Boot
+```
+id: 6, slug: 'premium-leather-boot'
+name: "Premium Leather Boot"
+brand: "Aurum Footwear"
+price: 520
+originalPrice: undefined
+category: "shoes"
+badge: null
+colors: ['#2a1f14', '#1a1a1a']
+sizes: ['38', '39', '40', '41', '42', '43']
+description: "Goodyear-welted construction meets contemporary design. Full-grain calf 
+leather with a hand-polished finish. Built to last decades."
+figType: "boot"
+bgGradient: "linear-gradient(135deg, #2a1f14, #1a1a1a)"
+figColorA: "#2a1f14"
+figColorB: "#3d2b1f"
+sku: "AUR-0006"
+stock: 9
+tags: ['boot', 'leather', 'goodyear', 'premium', 'footwear']
+```
+
+### Product 7: Stainless Steel Watch
+```
+id: 7, slug: 'stainless-steel-watch'
+name: "Stainless Steel Watch"
+brand: "Aurum Time"
+price: 1250
+originalPrice: undefined
+category: "accessories"
+badge: "new"
+colors: ['#c0c0c0', '#1a1a1a', '#8b7355']
+sizes: ['One Size']
+description: "Swiss-inspired precision in a 40mm case. Sapphire crystal, exhibition 
+caseback, 200m water resistance. Worn by those who value time."
+figType: "watch"
+bgGradient: "linear-gradient(135deg, #e8e4dc, #d0cbc0)"
+figColorA: "#c8c4bc"
+figColorB: "#a8a09c"
+sku: "AUR-0007"
+stock: 7
+tags: ['watch', 'steel', 'swiss', 'time', 'luxury']
+```
+
+### Product 8: Silk-Blend Dress Shirt
+```
+id: 8, slug: 'silk-blend-dress-shirt'
+name: "Silk-Blend Dress Shirt"
+brand: "Aurum Studio"
+price: 295
+originalPrice: 420
+category: "clothing"
+badge: "sale"
+colors: ['#ffffff', '#1a1a1a', '#f5f0e8']
+sizes: ['XS', 'S', 'M', 'L', 'XL']
+description: "A 70% silk, 30% cotton blend that drapes like nothing else. Mother-of-pearl 
+buttons, single-needle stitching, French seams throughout."
+figType: "shirt"
+bgGradient: "linear-gradient(135deg, #f0ece5, #e0dbd2)"
+figColorA: "#f0ece5"
+figColorB: "#ddd8d0"
+sku: "AUR-0008"
+stock: 31
+tags: ['shirt', 'silk', 'dress', 'formal', 'studio']
+```
+
+### Product 9: Messenger Leather Bag
+```
+id: 9, slug: 'messenger-leather-bag'
+name: "Messenger Leather Bag"
+brand: "Aurum Leather"
+price: 680
+originalPrice: undefined
+category: "accessories"
+badge: null
+colors: ['#2a1f14', '#1a1a1a', '#8b7355']
+sizes: ['One Size']
+description: "Structured full-grain leather with hand-stitched edges. Fits a 15\" laptop, 
+padded interior, and aged brass hardware. Timeless utility."
+figType: "bag"
+bgGradient: "linear-gradient(135deg, #4a3728, #3a2a1e)"
+figColorA: "#6b4a32"
+figColorB: "#5a3a28"
+sku: "AUR-0009"
+stock: 14
+tags: ['bag', 'messenger', 'leather', 'laptop', 'accessories']
+```
+
+### Product 10: Classic Loafer
+```
+id: 10, slug: 'classic-loafer'
+name: "Classic Loafer"
+brand: "Aurum Footwear"
+price: 380
+originalPrice: 490
+category: "shoes"
+badge: "sale"
+colors: ['#2a1f14', '#1a1a1a']
+sizes: ['38', '39', '40', '41', '42', '43', '44']
+description: "The definitive penny loafer, updated for the modern wardrobe. 
+Hand-burnished calfskin on a leather sole. Made in Naples."
+figType: "loafer"
+bgGradient: "linear-gradient(135deg, #3d2b1f, #2a1f15)"
+figColorA: "#4a3020"
+figColorB: "#382414"
+sku: "AUR-0010"
+stock: 22
+tags: ['loafer', 'penny', 'naples', 'leather', 'footwear']
+```
+
+### Product 11: Oversized T-Shirt
+```
+id: 11, slug: 'oversized-t-shirt'
+name: "Oversized T-Shirt"
+brand: "Aurum Basics"
+price: 95
+originalPrice: undefined
+category: "clothing"
+badge: null
+colors: ['#ffffff', '#1a1a1a', '#6b6b6b', '#8b7355']
+sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+description: "250gsm Supima cotton in an oversized boxy cut. Pre-washed for immediate 
+softness. The essential foundation of any elevated wardrobe."
+figType: "tshirt"
+bgGradient: "linear-gradient(135deg, #f5f3f0, #e8e4dd)"
+figColorA: "#e8e4dc"
+figColorB: "#d8d4cc"
+sku: "AUR-0011"
+stock: 88
+tags: ['tshirt', 'supima', 'oversized', 'basics', 'cotton']
+```
+
+### Product 12: Premium Sunglasses
+```
+id: 12, slug: 'premium-sunglasses'
+name: "Premium Sunglasses"
+brand: "Aurum Eyewear"
+price: 325
+originalPrice: undefined
+category: "accessories"
+badge: "new"
+colors: ['#1a1a1a', '#c09060']
+sizes: ['One Size']
+description: "Hand-finished Italian acetate frames with Carl Zeiss lenses. UV400 
+protection. Comes in a hand-stitched leather case."
+figType: "sunglasses"
+bgGradient: "linear-gradient(135deg, #d4cfc8, #c4bfb8)"
+figColorA: "#d0cbc4"
+figColorB: "#c0bbb4"
+sku: "AUR-0012"
+stock: 19
+tags: ['sunglasses', 'zeiss', 'acetate', 'italian', 'eyewear']
+```
+
+---
+
+## PRODUCT CARD COMPONENT (exact layout)
+
+```
+Structure:
+  <div class="prod-card"> 
+    <div class="prod-img-wrap" aspect-ratio: 3/4, bg: off-white>
+      [SVG illustration — full width/height, absolute positioned]
+      [Badge: absolute top=12px left=12px]
+      [Hover overlay actions — translateY(100%) → translateY(0) on hover]
+        [Add to Bag button] [Wishlist toggle ♡/♥ button]
+    </div>
+    <div class="prod-info" padding: 16px 0 0>
+      <div brand> — 9px, letter-spacing 0.2em, uppercase, #999
+      <div name>  — 14px, weight 400, line-height 1.3
+      <div price> — 14px, weight 400
+      <div colors> — small color dots (14×14px circles, border 1px #EAEAEA)
+    </div>
+  </div>
+
+Badges:
+  NEW: background #000, color #fff, 9px, letter-spacing 0.15em, uppercase, padding 5px 10px
+  SALE: background #C41E1E, color #fff, same specs
+
+Sale price display:
+  <span strikethrough color:#999 margin-right:8px>$originalPrice</span>$price
+
+Color swatches:
+  First color has active state (outline: 1px solid #000, outline-offset: 2px)
+  Max 4 colors shown
+  Width/height: 14×14px, border-radius: 50%
+
+Hover overlay actions:
+  "Add to Bag" button: flex:1, bg rgba(0,0,0,0.85), color #fff, 10px uppercase letter-spacing 0.15em
+    Hover: bg #000
+    backdrop-filter: blur(4px)
+  
+  Wishlist button: 44×44px, bg rgba(255,255,255,0.9)
+    Active state: bg #000, color #fff
+    backdrop-filter: blur(4px)
+    Font-size: 16px for ♡/♥ characters
+```
+
+---
+
+## SVG FIGURE ILLUSTRATIONS (exact SVG paths per figType)
+
+These are rendered as inline SVG at various sizes. The SVG viewBox is always "0 0 300 400".
+
+Each figure uses two colors: `ca` (lighter) and `cb` (darker), sourced from the product's figColorA and figColorB.
+
+```svg
+<!-- COAT figure -->
+<path d="M100 230 Q90 270 88 340 L90 400 H210 L212 340 Q210 270 200 230 L175 210 L150 220 L125 210Z" fill="{cb}" opacity="0.9"/>
+<ellipse cx="150" cy="170" rx="35" ry="40" fill="{ca}"/>
+<rect x="135" y="200" width="30" height="25" rx="15" fill="{ca}"/>
+
+<!-- SNEAKER figure -->
+<ellipse cx="150" cy="280" rx="90" ry="40" fill="{cb}" opacity="0.15"/>
+<path d="M70 270 Q80 200 150 190 Q210 185 240 230 L245 265 Q240 280 220 285 L80 285 Q65 278 70 270Z" fill="{cb}"/>
+<rect x="200" y="215" width="45" height="70" rx="8" fill="{ca}"/>
+
+<!-- HOODIE figure -->
+<path d="M95 230 Q85 265 83 330 L85 395 H215 L217 330 Q215 265 205 230 L175 215 L150 224 L125 215Z" fill="{cb}" opacity="0.95"/>
+<path d="M125 215 Q150 240 175 215 L165 200 L150 205 L135 200Z" fill="{ca}" opacity="0.3"/>
+<ellipse cx="150" cy="175" rx="33" ry="38" fill="{ca}"/>
+
+<!-- WALLET figure -->
+<rect x="80" y="160" width="140" height="100" rx="6" fill="{cb}"/>
+<rect x="80" y="185" width="140" height="3" fill="{ca}" opacity="0.3"/>
+<rect x="190" y="195" width="30" height="25" rx="3" fill="{ca}" opacity="0.5"/>
+
+<!-- PANTS figure -->
+<rect x="110" y="200" width="55" height="190" rx="4" fill="{cb}" opacity="0.95"/>
+<rect x="135" y="200" width="30" height="190" rx="4" fill="{cb}" opacity="0.8"/>
+<rect x="165" y="200" width="55" height="190" rx="4" fill="{cb}" opacity="0.95"/>
+
+<!-- BOOT figure -->
+<path d="M100 320 Q95 240 140 220 L170 215 Q200 240 200 280 L205 340 Q240 360 245 375 L245 390 H95 L95 375 Q95 340 100 320Z" fill="{cb}"/>
+
+<!-- WATCH figure -->
+<circle cx="150" cy="200" r="70" stroke="{cb}" stroke-width="14" fill="none"/>
+<circle cx="150" cy="200" r="55" fill="{ca}" opacity="0.2"/>
+<rect x="135" y="130" width="30" height="25" rx="4" fill="{cb}"/>
+<rect x="135" y="245" width="30" height="25" rx="4" fill="{cb}"/>
+<line x1="150" y1="145" x2="150" y2="190" stroke="{cb}" stroke-width="2.5"/>
+<line x1="150" y1="190" x2="180" y2="175" stroke="{cb}" stroke-width="2"/>
+
+<!-- SHIRT figure -->
+<path d="M100 225 Q90 260 88 330 L90 390 H210 L212 330 Q210 260 200 225 L175 208 L150 218 L125 208Z" fill="{cb}" opacity="0.9"/>
+<path d="M125 208 L138 215 L150 240 L162 215 L175 208" fill="none" stroke="{ca}" stroke-width="1.5" opacity="0.5"/>
+<ellipse cx="150" cy="172" rx="32" ry="37" fill="{ca}"/>
+
+<!-- BAG figure -->
+<rect x="80" y="185" width="140" height="130" rx="6" fill="{cb}"/>
+<path d="M115 185 Q115 155 150 150 Q185 155 185 185" stroke="{ca}" stroke-width="10" fill="none" stroke-linecap="round"/>
+<line x1="80" y1="225" x2="220" y2="225" stroke="{ca}" stroke-width="1.5" opacity="0.5"/>
+<rect x="130" y="238" width="40" height="26" rx="4" fill="{ca}" opacity="0.4"/>
+
+<!-- LOAFER figure -->
+<path d="M65 270 Q75 205 150 196 Q215 190 245 235 L248 265 Q242 282 220 285 L75 285 Q60 278 65 270Z" fill="{cb}"/>
+<ellipse cx="155" cy="265" rx="30" ry="10" fill="{ca}" opacity="0.15"/>
+
+<!-- TSHIRT figure -->
+<path d="M100 220 Q90 255 88 320 L90 385 H210 L212 320 Q210 255 200 220 L175 205 Q155 215 150 218 Q145 215 125 205Z" fill="{cb}" opacity="0.9"/>
+<path d="M100 220 Q85 215 72 230 L78 255 Q90 248 100 240Z" fill="{cb}" opacity="0.85"/>
+<path d="M200 220 Q215 215 228 230 L222 255 Q210 248 200 240Z" fill="{cb}" opacity="0.85"/>
+<ellipse cx="150" cy="170" rx="32" ry="37" fill="{ca}"/>
+
+<!-- SUNGLASSES figure -->
+<ellipse cx="150" cy="190" rx="100" ry="70" fill="{ca}" opacity="0.08"/>
+<ellipse cx="115" cy="195" rx="40" ry="28" fill="{cb}" opacity="0.85"/>
+<ellipse cx="185" cy="195" rx="40" ry="28" fill="{cb}" opacity="0.85"/>
+<line x1="155" y1="195" x2="175" y2="195" stroke="{cb}" stroke-width="3"/>
+<line x1="75" y1="195" x2="55" y2="185" stroke="{cb}" stroke-width="3"/>
+<line x1="225" y1="195" x2="245" y2="185" stroke="{cb}" stroke-width="3"/>
+```
+
+All SVG figures are wrapped in `<g transform="translate(0,10)">...</g>`
+
+On product card, the SVG sits at: `viewBox="0 0 300 400"`, `width="100%"`, `height="100%"`, `position: absolute; top: 0; left: 0`
+
+---
+
+## EDITORIAL SECTION (below product grid)
+
+```
+Layout: CSS Grid 1fr 1fr, gap 2px, min-height 600px
+Margin: 80px 0
+
+LEFT BLOCK:
+  BG: linear-gradient(135deg, #f0ebe3, #e0d5c8)
+  Display: flex column, justify: flex-end, padding: 64px
+  Position: relative, overflow hidden
+
+  SVG ghost figure (position absolute, right side, 70% height, opacity 0.25):
+    Tall coat silhouette shape in #6a5e4e
+
+  Top-left label: "Editorial", 10px, letter-spacing 0.3em, uppercase, absolute top=40px left=48px
+
+  Content (at bottom):
+    Eyebrow: "The Edit" — 10px, uppercase, letter-spacing 0.25em, color #999
+    H3: "Autumn Winter Collection 2026" — Cormorant, 38px, italic, weight 300
+    Link: "Explore the look →" — 11px, uppercase, letter-spacing 0.15em
+      Arrow: inline SVG (→ path) 16px
+      Hover: gap between text and arrow expands (10px → 16px, transition 0.3s)
+
+RIGHT COLUMN (grid-template-rows: 1fr 1fr, gap 2px):
+
+  TOP RIGHT BLOCK (dark):
+    BG: linear-gradient(135deg, #1a1a1a, #0a0a0a)
+    Padding: 40px, display flex align-items: flex-end
+    Eyebrow: "Craftsmanship" — rgba(255,255,255,0.5)
+    H3: "Sustainably sourced, meticulously made" — Cormorant 26px italic, color #fff
+
+  BOTTOM RIGHT BLOCK (light):
+    BG: #EAEAEA
+    Padding: 40px, display flex align-items: flex-end
+    Content column:
+      Eyebrow: "Members" — #999
+      H3: "Exclusive access to private sales" — Cormorant 26px italic
+      Link: "Join Aurum →" — same arrow link style
+```
+
+### BRANDS STRIP
+
+```
+Padding: 60px 0
+Border-top + border-bottom: 1px solid #EAEAEA
+
+6 brand names in flex row, space-between:
+  "Maison Noir" | "Vesti Arte" | "Luxe & Co" | "Forma" | "Atelier M" | "Essence"
+  Font: Cormorant Garamond, 18px, weight 500, letter-spacing 0.1em
+  Color: #000, opacity: 0.25
+  Hover: opacity 0.6, transition 0.3s
+  cursor: default (these are display-only brand partners)
+```
+
+### FEATURES / USPs SECTION
+
+```
+Grid: 4 columns, gap 40px
+
+Each feature:
+  Icon container: 48×48px, margin: 0 auto 20px, border: 1px solid #EAEAEA, flex center
+  Icon: 20×20px SVG (stroke-width 1, color: #000)
+  Title: 12px, letter-spacing 0.15em, uppercase, margin-bottom 10px, weight 400
+  Desc: 13px, color #999, line-height 1.7
+
+Feature 1 — Free Shipping:
+  Icon: arrow-right SVG path: "M5 12h14M12 5l7 7-7 7"
+  Title: "Free Shipping"
+  Desc: "Complimentary worldwide delivery on all orders over $250"
+
+Feature 2 — Authenticity Guaranteed:
+  Icon: checkmark circle SVG
+  Title: "Authenticity Guaranteed"
+  Desc: "Every piece is verified and certified before delivery"
+
+Feature 3 — 30-Day Returns:
+  Icon: three lines (hamburger) SVG
+  Title: "30-Day Returns"
+  Desc: "Hassle-free returns within 30 days, no questions asked"
+
+Feature 4 — Luxury Packaging:
+  Icon: flag/ribbon SVG
+  Title: "Luxury Packaging"
+  Desc: "Beautifully packaged in our signature gift boxes"
+```
+
+---
+
+## NEWSLETTER SECTION
+
+```
+BG: #000000, color: #FFFFFF
+Padding: 100px 0
+Text-align: center
+
+Label: "Stay Connected" — 10px, uppercase, letter-spacing 0.3em, rgba(255,255,255,0.4)
+H2: "The Inner Circle" — Cormorant, clamp(36px,4vw,56px), italic, weight 300
+Sub: "First access to new collections, exclusive events, and members-only offers."
+     14px, color rgba(255,255,255,0.5), margin-bottom 48px, weight 300
+
+Form (flex row, max-width 480px, centered, border: 1px solid rgba(255,255,255,0.2)):
+  Email input:
+    Flex: 1, bg transparent, border none, padding 16px 24px
+    Font: Inter 13px, color #fff, weight 300
+    Placeholder color: rgba(255,255,255,0.3)
+    outline: none
+
+  Subscribe button:
+    BG: #ffffff, color: #000
+    Border: none, padding 16px 28px
+    Font: Inter 10px, uppercase, letter-spacing 0.2em, weight 400
+    Hover: BG #F5F5F5
+    White-space: nowrap
+```
+
+---
+
+## FOOTER
+
+```
+BG: #000000
+Padding: 80px 0 40px
+Border-top: 1px solid rgba(255,255,255,0.08)
+Color: #FFFFFF
+
+Grid: 4 columns (2fr 1fr 1fr 1fr), gap 60px, margin-bottom 60px
+
+Column 1 (brand):
+  "AURUM" — Cormorant, 28px, weight 500, letter-spacing 0.15em
+  Tagline: 13px, rgba(255,255,255,0.4), line-height 1.8, max-width 280px, weight 300
+
+Column 2 (Shop):
+  Title: "Shop" — 10px, uppercase, letter-spacing 0.25em, rgba(255,255,255,0.4)
+  Links: New Arrivals / Clothing / Shoes / Accessories / Sale*
+  *"Sale" link color: rgba(200,92,92,1)
+
+Column 3 (Company):
+  Title: "Company"
+  Links: About Aurum / Sustainability / Careers / Press / Stores
+
+Column 4 (Support):
+  Title: "Support"
+  Links: Contact Us / Size Guide / Shipping Info / Returns / Privacy Policy
+
+All footer links:
+  Font: 13px, rgba(255,255,255,0.6), weight 300
+  Hover: rgba(255,255,255,1)
+  Display: block, margin-bottom 14px, cursor pointer
+
+Footer bottom bar:
+  Flex, space-between, border-top: 1px solid rgba(255,255,255,0.08), padding-top 32px
+  Left: "© 2026 Aurum. All rights reserved." — 12px, rgba(255,255,255,0.3)
+  Right: Social links: Instagram | Pinterest | TikTok | Twitter
+    12px, letter-spacing 0.1em, uppercase, rgba(255,255,255,0.4)
+    Hover: rgba(255,255,255,1)
+    Gap: 20px
+```
+
+---
+
+## CART DRAWER (slide-out from right)
+
+```
+Backdrop: fixed, inset 0, bg rgba(0,0,0,0) → rgba(0,0,0,0.4) on open, pointer-events
+Click backdrop → close cart
+
+Drawer:
+  Position: fixed, top 0, right: -420px → 0 when open
+  Width: 420px (100% on mobile)
+  Height: 100vh
+  BG: #FFFFFF
+  Display: flex column
+  box-shadow: -20px 0 60px rgba(0,0,0,0.1)
+  Transition: right 0.4s cubic-bezier(0.4,0,0.2,1)
+
+Header (padding 32px, border-bottom: 1px solid #EAEAEA, flex space-between):
+  Title "Your Bag" — Cormorant, 24px, italic, weight 400
+  Close button "✕" — 20px, opacity 0.5 → 1 on hover
+
+Items area (flex:1, overflow-y auto, padding 24px 32px):
+  Each cart item (flex row, gap 16px, padding 20px 0, border-bottom 1px #EAEAEA):
+    Image (80×100px, bg #F5F5F5): mini SVG illustration of product
+    Details column:
+      Product name — 13px, weight 400
+      Size meta — 11px, color #999, letter-spacing 0.05em
+      Price — 14px, weight 400
+      Qty controls (flex row): [−] qty [+]  [Remove]
+        Qty buttons: 28×28px, border 1px #EAEAEA, hover: bg #000 color #fff
+        Qty number: 13px, min-width 20px, text-center
+        Remove: 11px, uppercase, letter-spacing 0.1em, color #999, hover #000
+
+  Empty state:
+    Icon: ⊡ (large, opacity 0.2)
+    Title: "Your bag is empty" — Cormorant 20px italic weight 300
+    Sub: "Add pieces to your collection" — 13px #999
+
+Footer (padding 24px 32px, border-top 1px #EAEAEA):
+  Subtotal row: flex space-between, 13px (label in #999)
+  Shipping row: flex space-between, 13px (Free if order ≥ $250, else $25)
+  Divider: border-top 1px #EAEAEA, margin 8px 0
+  Total row: flex space-between, 16px, weight 500
+  "Proceed to Checkout" button: full width, bg #000, color #fff, 18px padding
+    Font: 11px, uppercase, letter-spacing 0.2em
+    Hover: bg #333
+  "Continue Shopping" button: full width, border 1px #000, bg transparent, color #000
+    Font: 11px, uppercase, letter-spacing 0.15em, padding 14px
+    Hover: bg #000, color #fff
+```
+
+---
+
+## PRODUCT MODAL (full-screen overlay on product click)
+
+```
+Backdrop: fixed inset 0, bg rgba(0,0,0,0.5), opacity 0→1 on open
+Click outside modal → close
+Press Escape → close
+
+Modal container: max-width 960px, max-height 90vh, overflow-y auto
+Layout: CSS Grid 1fr 1fr
+BG: #FFFFFF
+
+Close button: position absolute top=20px right=20px, ✕, 20px
+
+LEFT — Image area (BG: #F5F5F5, min-height 500px):
+  Full-size product SVG illustration (viewBox 0 0 400 520, scale 1.35)
+  Bottom: 3 small thumbnail selectors
+    Each: 48×60px, border (active: 1px #000, inactive: 1px #ddd)
+    Shows mini version of SVG
+
+RIGHT — Product info (padding: 48px, display flex column):
+  Brand: 10px, uppercase, letter-spacing 0.2em, color #999
+  Product name: Cormorant, 28px, weight 400, line-height 1.2
+  Price: 22px, weight 400
+    Sale: strikethrough original in #999 + current price
+  Description: 13px, line-height 1.8, color #333, weight 300, margin-bottom 32px
+  
+  "Size — [selected]" label: 10px, uppercase, letter-spacing 0.15em, color #999
+  Size buttons (flex wrap, gap 8px, margin-bottom 24px):
+    Each: 44×44px, border 1px #EAEAEA, 12px font
+    Active: bg #000, color #fff, border #000
+    Hover: same as active
+
+  Actions row (flex, gap 10px, margin-top auto):
+    "Add to Bag" button: flex 1, bg #000, color #fff, padding 16px
+      Font: 11px, uppercase, letter-spacing 0.15em
+      Hover: bg #333
+    Wishlist button: 52×52px, border 1px #EAEAEA, ♡/♥ 18px
+      Active/hover: bg #000, color #fff, border #000
+
+  Footer info (border-top 1px #EAEAEA, padding-top 20px, margin-top 24px):
+    "Free shipping over $250 · Free returns" — 11px, uppercase, letter-spacing 0.1em, #999
+    SKU: 11px, #999
+```
+
+---
+
+## SEARCH OVERLAY
+
+```
+Position: fixed inset 0
+BG: rgba(255,255,255,0.97), backdrop-filter: blur(8px)
+Opacity: 0→1, pointer-events none→all on open
+Padding: 120px 40px 40px
+
+Centered column, max-width 700px, margin 0 auto:
+
+Search bar (border-bottom: 2px solid #000, flex row, gap 16px, padding-bottom 16px):
+  Input:
+    flex: 1
+    font-family: Cormorant Garamond, italic, weight 300
+    font-size: clamp(24px, 3vw, 40px)
+    border: none, outline: none, bg transparent, color #000
+    placeholder: "Search collections…", placeholder-color: #EAEAEA
+  Close button: ✕, 24px, color #999 → #000, bg none, border none, cursor pointer
+  
+  onKeydown Escape → close overlay
+  autofocus on open
+
+Trending section:
+  Title: "Trending searches" — 10px, uppercase, letter-spacing 0.25em, color #999, margin-bottom 20px
+  Tags (flex wrap, gap 8px):
+    Each tag: padding 8px 20px, border 1px #EAEAEA, 12px, uppercase, letter-spacing 0.1em
+    Hover: bg #000, color #fff, border #000
+    Tags: "Oversized Jacket" | "Minimal Sneaker" | "Leather Bag" | "Cashmere Hoodie" |
+          "Tailored Pants" | "Silk Shirt" | "Statement Watch"
+    Click tag → populate search input + run search
+
+Live search results (below tags):
+  Show on typing (filter from products array)
+  Each result row (flex, gap 16px, padding 16px 0, border-bottom 1px #EAEAEA, cursor pointer):
+    Mini product image (56×70px SVG)
+    Info column: brand (9px uppercase), name (15px Cormorant), price (13px)
+    Hover: opacity 0.6
+  
+  If no results: italic message "No results for '[query]'"
+  Count: "[N] results" — 10px uppercase, letter-spacing 0.25em, #999
+```
+
+---
+
+## TOAST NOTIFICATION SYSTEM
+
+```
+Position: fixed, bottom 32px, left 50%, transform translateX(-50%)
+BG: #000, color: #fff
+Padding: 14px 28px
+Font: Inter 12px, uppercase, letter-spacing 0.1em
+z-index: 9999
+White-space: nowrap
+
+Animation:
+  Hidden: opacity 0, translateX(-50%) translateY(20px)
+  Shown: opacity 1, translateX(-50%) translateY(0)
+  Transition: all 0.4s cubic-bezier(0.4,0,0.2,1)
+  Auto-dismiss: 3000ms
+
+Toast messages used:
+  "{ productName } added to bag"
+  "{ productName } saved to wishlist"
+  "Removed from wishlist"
+  "Please enter a valid email"
+  "Welcome to the inner circle ✓"
+  "Loading more products…"
+  "Account coming soon"
+```
+
+---
+
+## SCROLL-TRIGGERED ANIMATIONS
+
+```css
+/* Applied to section containers */
+.fade-up {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1),
+              transform 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+```
+
+```js
+// IntersectionObserver config
+const observer = new IntersectionObserver(
+  (entries) => entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible')
+      observer.unobserve(e.target)
+    }
+  }),
+  { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+)
+
+// Applied to: .categories-grid, .products-header, .editorial,
+//             .brands .brands-inner, .features-grid, .newsletter > div
+```
+
+---
+
+## SUPABASE DATABASE SCHEMA (PostgreSQL)
+
+```sql
+-- Enable UUID extension
+create extension if not exists "uuid-ossp";
+
+-- USERS PROFILES (extends Supabase auth.users)
+create table profiles (
+  id uuid references auth.users primary key,
+  full_name text,
+  email text unique not null,
+  phone text,
+  avatar_url text,
+  role text default 'customer' check (role in ('customer', 'admin')),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- CATEGORIES
+create table categories (
+  id uuid default uuid_generate_v4() primary key,
+  name text not null,
+  slug text unique not null,
+  parent_id uuid references categories(id),
+  description text,
+  image_url text,
+  is_active boolean default true,
+  sort_order int default 0,
+  created_at timestamptz default now()
+);
+
+-- PRODUCTS
+create table products (
+  id uuid default uuid_generate_v4() primary key,
+  name text not null,
+  slug text unique not null,
+  brand text not null,
+  description text,
+  price numeric(10,2) not null,
+  original_price numeric(10,2),
+  category_id uuid references categories(id),
+  badge text check (badge in ('new', 'sale', null)),
+  fig_type text not null,
+  bg_gradient text,
+  fig_color_a text,
+  fig_color_b text,
+  sku text unique not null,
+  stock int default 0,
+  is_active boolean default true,
+  tags text[],
+  metadata jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- PRODUCT VARIANTS (size + color combinations)
+create table product_variants (
+  id uuid default uuid_generate_v4() primary key,
+  product_id uuid references products(id) on delete cascade,
+  size text not null,
+  color_hex text,
+  color_name text,
+  stock int default 0,
+  price_modifier numeric(10,2) default 0,
+  sku_variant text unique,
+  created_at timestamptz default now()
+);
+
+-- PRODUCT IMAGES
+create table product_images (
+  id uuid default uuid_generate_v4() primary key,
+  product_id uuid references products(id) on delete cascade,
+  url text not null,
+  alt text,
+  sort_order int default 0,
+  is_primary boolean default false,
+  created_at timestamptz default now()
+);
+
+-- ADDRESSES
+create table addresses (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  full_name text not null,
+  line1 text not null,
+  line2 text,
+  city text not null,
+  state text not null,
+  postal_code text not null,
+  country text not null default 'US',
+  phone text,
+  is_default boolean default false,
+  created_at timestamptz default now()
+);
+
+-- ORDERS
+create table orders (
+  id uuid default uuid_generate_v4() primary key,
+  order_number text unique not null,
+  user_id uuid references profiles(id),
+  status text default 'pending' check (status in (
+    'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'
+  )),
+  subtotal numeric(10,2) not null,
+  shipping_cost numeric(10,2) default 0,
+  tax numeric(10,2) default 0,
+  discount numeric(10,2) default 0,
+  total numeric(10,2) not null,
+  shipping_address jsonb,
+  billing_address jsonb,
+  stripe_payment_intent_id text,
+  stripe_session_id text,
+  notes text,
+  tracking_number text,
+  shipped_at timestamptz,
+  delivered_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- ORDER ITEMS
+create table order_items (
+  id uuid default uuid_generate_v4() primary key,
+  order_id uuid references orders(id) on delete cascade,
+  product_id uuid references products(id),
+  product_name text not null,
+  product_sku text not null,
+  variant_size text,
+  variant_color text,
+  quantity int not null,
+  unit_price numeric(10,2) not null,
+  total_price numeric(10,2) not null,
+  created_at timestamptz default now()
+);
+
+-- WISHLIST
+create table wishlists (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  product_id uuid references products(id) on delete cascade,
+  created_at timestamptz default now(),
+  unique(user_id, product_id)
+);
+
+-- REVIEWS
+create table reviews (
+  id uuid default uuid_generate_v4() primary key,
+  product_id uuid references products(id) on delete cascade,
+  user_id uuid references profiles(id),
+  rating int not null check (rating between 1 and 5),
+  title text,
+  body text,
+  is_verified_purchase boolean default false,
+  is_published boolean default true,
+  created_at timestamptz default now()
+);
+
+-- COUPONS
+create table coupons (
+  id uuid default uuid_generate_v4() primary key,
+  code text unique not null,
+  type text check (type in ('percentage', 'fixed')),
+  value numeric(10,2) not null,
+  min_order_amount numeric(10,2),
+  max_uses int,
+  uses_count int default 0,
+  expires_at timestamptz,
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
+
+-- NEWSLETTER
+create table newsletter_subscribers (
+  id uuid default uuid_generate_v4() primary key,
+  email text unique not null,
+  is_active boolean default true,
+  subscribed_at timestamptz default now()
+);
+
+-- Generate order numbers
+create or replace function generate_order_number()
+returns trigger as $$
+begin
+  new.order_number := 'AUR-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
+  return new;
+end;
+$$ language plpgsql;
+
+create sequence order_seq start 1000;
+create trigger set_order_number before insert on orders for each row execute function generate_order_number();
+
+-- RLS POLICIES
+alter table profiles enable row level security;
+alter table orders enable row level security;
+alter table order_items enable row level security;
+alter table wishlists enable row level security;
+alter table addresses enable row level security;
+alter table reviews enable row level security;
+
+-- Users can only see/edit their own data
+create policy "Users own profile" on profiles for all using (auth.uid() = id);
+create policy "Users own orders" on orders for all using (auth.uid() = user_id);
+create policy "Users own order items" on order_items for select using (
+  exists (select 1 from orders where orders.id = order_items.order_id and orders.user_id = auth.uid())
+);
+create policy "Users own wishlist" on wishlists for all using (auth.uid() = user_id);
+create policy "Users own addresses" on addresses for all using (auth.uid() = user_id);
+
+-- Products and categories are public
+create policy "Products are public" on products for select using (is_active = true);
+create policy "Categories are public" on categories for select using (is_active = true);
+create policy "Reviews are public" on reviews for select using (is_published = true);
+
+-- Admin can do everything (check role from profiles)
+create policy "Admin full access" on products for all using (
+  exists (select 1 from profiles where profiles.id = auth.uid() and profiles.role = 'admin')
+);
+```
+
+---
+
+## ZUSTAND STORES
+
+### Cart Store (`/stores/cartStore.ts`)
+```typescript
+interface CartItem {
+  id: string           // product id
+  productId: number
+  name: string
+  brand: string
+  price: number
+  size: string
+  colorHex: string
+  figType: string
+  bgGradient: string
+  figColorA: string
+  figColorB: string
+  quantity: number
+  sku: string
+}
+
+interface CartStore {
+  items: CartItem[]
+  isOpen: boolean
+  addItem: (product: Product, size: string, color: string) => void
+  removeItem: (productId: number, size: string) => void
+  updateQty: (productId: number, size: string, delta: number) => void
+  clearCart: () => void
+  openCart: () => void
+  closeCart: () => void
+  total: () => number
+  itemCount: () => number
+  shipping: () => number
+}
+// Persist to localStorage
+```
+
+### Wishlist Store (`/stores/wishlistStore.ts`)
+```typescript
+interface WishlistStore {
+  items: number[]        // product ids
+  toggle: (id: number) => void
+  isInWishlist: (id: number) => boolean
+  count: () => number
+}
+// Persist to localStorage + sync with Supabase if authenticated
+```
+
+### UI Store (`/stores/uiStore.ts`)
+```typescript
+interface UIStore {
+  searchOpen: boolean
+  activeTab: string
+  toastMessage: string
+  toastVisible: boolean
+  openSearch: () => void
+  closeSearch: () => void
+  setTab: (tab: string) => void
+  showToast: (message: string) => void
+}
+```
+
+---
+
+## STRIPE INTEGRATION
+
+### Setup
+```typescript
+// /lib/stripe.ts
+import Stripe from 'stripe'
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-12-18'
+})
+
+// Frontend
+import { loadStripe } from '@stripe/stripe-js'
+export const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+```
+
+### Checkout Flow
+```typescript
+// /api/checkout/route.ts (POST)
+// 1. Validate cart items against DB
+// 2. Create Stripe Checkout Session
+// 3. Return session URL
+// Redirect user to Stripe hosted checkout
+
+// /api/webhooks/stripe/route.ts (POST)
+// Handle events:
+//   checkout.session.completed → create order, send confirmation email
+//   payment_intent.payment_failed → update order status
+//   charge.refunded → update order status to refunded
+```
+
+---
+
+## AUTHENTICATION PAGES
+
+### /auth/login
+```
+Layout: centered card, max-width 440px
+Logo at top (AURUM, Cormorant, large)
+H1: "Welcome back" (Cormorant italic)
+Sub: "Sign in to your account"
+Form:
+  Email input (full width)
+  Password input (full width, show/hide toggle)
+  "Forgot password?" link (right-aligned, 12px)
+  Submit button "Sign In" (full width, black filled)
+Divider: "or"
+Google OAuth button (outlined, with Google icon)
+Footer: "New to Aurum? Create account" link
+Transition: fade in, 0.5s on mount
+```
+
+### /auth/register
+```
+Same centered card layout
+H1: "Create your account"
+Fields: Full Name / Email / Password / Confirm Password
+Terms checkbox: "I agree to Terms & Privacy Policy"
+Submit: "Create Account"
+Footer: "Already have an account? Sign in"
+```
+
+---
+
+## ADMIN PANEL (/admin — role-protected)
+
+```
+Access: only users with profiles.role = 'admin'
+Redirect non-admins to /
+
+Layout:
+  Left sidebar (240px, bg #000, color #fff)
+    - AURUM logo
+    - Nav: Dashboard / Products / Orders / Customers / Inventory / Content / Settings
+  
+  Main content area (bg #F5F5F5)
+
+Dashboard cards (grid 4 cols):
+  Revenue (total), Orders (count), Customers (count), Conversion Rate
+
+Charts:
+  Sales over time (line chart — Recharts)
+  Orders by category (bar chart — Recharts)
+  Revenue trend (area chart — Recharts)
+
+Recent orders table:
+  Columns: Order # / Customer / Items / Total / Status / Date / Actions
+  Status badges: colored pills
+
+Top products table:
+  Columns: Product / Sales / Revenue / Stock
+
+PRODUCT MANAGEMENT:
+  /admin/products — data table with search + filter
+  /admin/products/new — create form
+  /admin/products/[id]/edit — edit form
+  Fields: name, brand, price, originalPrice, category, badge, description,
+          sizes (multi-select), colors (color pickers), stock, sku, tags
+  Image upload: Supabase Storage
+
+ORDER MANAGEMENT:
+  View all orders, filter by status
+  Update status dropdown
+  View order details modal
+  Print invoice button
+
+CUSTOMER MANAGEMENT:
+  View all customers
+  Search by name/email
+  View order history
+  Suspend/activate account
+
+INVENTORY:
+  Low stock alerts (stock < 10)
+  Out of stock filter
+  Bulk stock update
+```
+
+---
+
+## RESPONSIVE BREAKPOINTS
+
+```css
+/* Tablet (max-width: 1024px) */
+.hero { grid-template-columns: 1fr }
+.hero-content { padding: 60px 40px }
+.hero-image { height: 60vw; min-height: 400px }
+.categories-grid { grid-template-columns: 1fr 1fr }
+.products-grid { grid-template-columns: repeat(3, 1fr) }
+.features-grid { grid-template-columns: repeat(2, 1fr) }
+.footer-grid { grid-template-columns: 1fr 1fr; gap: 40px }
+.editorial { grid-template-columns: 1fr }
+.brands-inner { flex-wrap: wrap; justify-content: center; gap: 24px }
+.modal { grid-template-columns: 1fr }
+
+/* Mobile (max-width: 768px) */
+--nav-h: 56px
+.nav-links { display: none }  /* hide desktop nav */
+.nav-inner { padding: 0 20px }
+.container { padding: 0 20px }
+section { padding: 64px 0 }
+.categories-grid { grid-template-columns: 1fr }
+.products-grid { grid-template-columns: repeat(2, 1fr) }
+.cart-drawer { width: 100%; right: -100% }
+.newsletter-form { flex-direction: column }
+```
+
+---
+
+## FILE STRUCTURE
+
+```
+aurum/
+├── app/
+│   ├── (storefront)/
+│   │   ├── page.tsx                    # Homepage
+│   │   ├── products/
+│   │   │   ├── page.tsx                # All products
+│   │   │   └── [slug]/page.tsx         # Product detail
+│   │   ├── category/[slug]/page.tsx    # Category page
+│   │   ├── search/page.tsx
+│   │   ├── cart/page.tsx
+│   │   └── checkout/
+│   │       ├── page.tsx
+│   │       ├── shipping/page.tsx
+│   │       └── success/page.tsx
+│   ├── (auth)/
+│   │   ├── login/page.tsx
+│   │   ├── register/page.tsx
+│   │   ├── forgot-password/page.tsx
+│   │   └── reset-password/page.tsx
+│   ├── account/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx                    # Dashboard
+│   │   ├── orders/page.tsx
+│   │   ├── wishlist/page.tsx
+│   │   ├── profile/page.tsx
+│   │   └── addresses/page.tsx
+│   ├── admin/
+│   │   ├── layout.tsx                  # Role check
+│   │   ├── page.tsx                    # Dashboard
+│   │   ├── products/
+│   │   │   ├── page.tsx
+│   │   │   ├── new/page.tsx
+│   │   │   └── [id]/edit/page.tsx
+│   │   ├── orders/page.tsx
+│   │   ├── customers/page.tsx
+│   │   └── inventory/page.tsx
+│   ├── api/
+│   │   ├── checkout/route.ts
+│   │   ├── webhooks/stripe/route.ts
+│   │   └── products/route.ts
+│   ├── layout.tsx                      # Root layout
+│   └── globals.css
+├── components/
+│   ├── layout/
+│   │   ├── Navbar.tsx
+│   │   ├── Footer.tsx
+│   │   └── CartDrawer.tsx
+│   ├── home/
+│   │   ├── Hero.tsx
+│   │   ├── Marquee.tsx
+│   │   ├── Categories.tsx
+│   │   ├── ProductGrid.tsx
+│   │   ├── Editorial.tsx
+│   │   ├── BrandsStrip.tsx
+│   │   ├── Features.tsx
+│   │   └── Newsletter.tsx
+│   ├── product/
+│   │   ├── ProductCard.tsx
+│   │   ├── ProductModal.tsx
+│   │   ├── ProductFigure.tsx          # SVG illustrations
+│   │   ├── SizeSelector.tsx
+│   │   ├── ColorSwatches.tsx
+│   │   └── ProductBadge.tsx
+│   ├── search/
+│   │   └── SearchOverlay.tsx
+│   ├── ui/
+│   │   ├── Toast.tsx
+│   │   ├── Button.tsx
+│   │   └── FadeUp.tsx                 # Scroll animation wrapper
+│   └── admin/
+│       ├── Sidebar.tsx
+│       ├── StatsCard.tsx
+│       └── DataTable.tsx
+├── stores/
+│   ├── cartStore.ts
+│   ├── wishlistStore.ts
+│   └── uiStore.ts
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts
+│   │   ├── server.ts
+│   │   └── middleware.ts
+│   ├── stripe.ts
+│   └── products.ts                    # Product data + helpers
+├── types/
+│   └── index.ts
+├── public/
+│   └── fonts/ (if self-hosting)
+├── middleware.ts                       # Auth protection
+├── next.config.ts
+├── tailwind.config.ts
+└── .env.local
+```
+
+---
+
+## ENVIRONMENT VARIABLES (.env.local)
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+RESEND_API_KEY=re_...
+
+NEXT_PUBLIC_SITE_NAME=AURUM
+NEXT_PUBLIC_SITE_DESCRIPTION=Luxury fashion rooted in timeless craft.
+```
+
+---
+
+## SEO METADATA (Next.js Metadata API)
+
+```typescript
+// /app/layout.tsx
+export const metadata = {
+  title: { default: 'AURUM — Luxury Fashion', template: '%s | AURUM' },
+  description: 'Luxury fashion rooted in timeless craft. Discover SS26 Collection.',
+  keywords: ['luxury fashion', 'aurum', 'editorial fashion', 'premium clothing'],
+  openGraph: {
+    title: 'AURUM — Luxury Fashion',
+    description: 'Luxury fashion rooted in timeless craft.',
+    siteName: 'AURUM',
+    type: 'website',
+  },
+  twitter: { card: 'summary_large_image' },
+  robots: { index: true, follow: true },
+}
+
+// Dynamic product metadata
+export async function generateMetadata({ params }) {
+  const product = await getProduct(params.slug)
+  return {
+    title: product.name,
+    description: product.description,
+    openGraph: { title: product.name, images: [product.images[0]] }
+  }
+}
+```
+
+---
+
+## PERFORMANCE TARGETS
+
+```
+Lighthouse Desktop:   ≥ 95 all categories
+Lighthouse Mobile:    ≥ 90 all categories
+LCP:                  < 2.5s
+FID:                  < 100ms
+CLS:                  < 0.1
+
+Strategies:
+- next/image with sizes prop on all product images
+- React Server Components for product listings
+- Streaming with Suspense boundaries
+- next/font for Google Fonts (zero layout shift)
+- Dynamic imports for Framer Motion
+- ISR (Incremental Static Regeneration) for product pages
+- Edge Runtime for middleware (auth checks)
+```
+
+---
+
+## SECURITY REQUIREMENTS
+
+```
+- Supabase Row Level Security on all user tables (see schema above)
+- Admin routes protected by middleware checking profiles.role = 'admin'
+- All API routes validate Supabase session
+- Stripe webhook signature verification
+- Rate limiting on auth routes (Supabase handles this)
+- CSRF: Next.js built-in + SameSite cookies
+- Input sanitization with Zod schemas
+- No secret keys in client-side code
+- Content Security Policy headers in next.config.ts
+```
+
+---
+
+## LAUNCH CHECKLIST
+
+When build is complete, verify:
+- [ ] All 12 products display with correct SVG illustrations and color pairs
+- [ ] All 4 category cards render with correct backgrounds and hover effects
+- [ ] Hero SVG fashion figure renders correctly with all layers
+- [ ] Marquee scrolls infinitely without jumping
+- [ ] Cart drawer opens/closes with smooth animation (right: -420px → 0)
+- [ ] Product modal opens on card click, shows correct product data
+- [ ] Search overlay opens with focus, live-filters products
+- [ ] Toast notifications appear and auto-dismiss after 3s
+- [ ] Wishlist ♡/♥ toggle works and persists
+- [ ] Scroll-triggered fade-up animations fire once per section
+- [ ] All tabs filter products correctly
+- [ ] Supabase auth flow (register, login, forgot password) works
+- [ ] Cart persists on page refresh (localStorage)
+- [ ] Stripe checkout redirects correctly
+- [ ] Webhook creates order record in Supabase
+- [ ] Admin panel is inaccessible to non-admin users
+- [ ] Responsive at 375px, 768px, 1024px, 1440px, 1920px
+- [ ] No horizontal scroll on any breakpoint
+- [ ] Lighthouse score ≥ 95 desktop
+
+---
+
+*This prompt was generated to recreate the AURUM luxury fashion eCommerce website
+with pixel-perfect fidelity. Every specification is exact and must be followed as written.*

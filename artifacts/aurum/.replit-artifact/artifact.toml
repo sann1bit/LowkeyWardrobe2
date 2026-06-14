@@ -1,0 +1,38 @@
+kind = "web"
+previewPath = "/"
+title = "AURUM — Luxury Fashion"
+version = "1.0.0"
+id = "artifacts/aurum"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19800
+
+[services.development]
+run = "pnpm --filter @workspace/aurum run dev"
+
+[services.production]
+publicDir = "artifacts/aurum/dist/public"
+serve = "static"
+
+[services.production.build]
+args = ["pnpm", "--filter", "@workspace/aurum", "run", "build"]
+
+[services.production.build.env]
+PORT = "19800"
+BASE_PATH = "/"
+NODE_ENV = "production"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19800"
+BASE_PATH = "/"

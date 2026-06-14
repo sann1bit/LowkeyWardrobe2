@@ -1,0 +1,2 @@
+- [PKR price filter default](pkr-price-filter.md) — Products.tsx priceRange default must match price scale; PKR prices need [0,100000] not [0,2000]
+- [DB numeric prices as strings](db-numeric-strings.md) — PostgreSQL numeric type returns strings via Drizzle; always wrap with Number() before comparison
