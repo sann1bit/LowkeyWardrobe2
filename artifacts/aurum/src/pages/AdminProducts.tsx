@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminLayout, adminFetch } from '../components/AdminLayout';
 import { Search, Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Package, Star, ImagePlus, Upload, Link2 } from 'lucide-react';
-import { useUpload } from '@workspace/object-storage-web';
 
 interface AdminProduct {
   id: number;
@@ -57,6 +56,29 @@ const DEFAULT_FORM = {
 
 type FormState = typeof DEFAULT_FORM;
 
+async function uploadImageToSupabase(file: File, onProgress?: (pct: number) => void): Promise<string> {
+  const res = await adminFetch('/api/storage/uploads/request-url', {
+    method: 'POST',
+    body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+  });
+  if (!res.ok) throw new Error('Failed to get upload URL');
+  const { uploadURL, publicUrl } = await res.json();
+
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadURL);
+    xhr.setRequestHeader('Content-Type', file.type);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed: ${xhr.status}`)));
+    xhr.onerror = () => reject(new Error('Upload error'));
+    xhr.send(file);
+  });
+
+  return publicUrl;
+}
+
 export default function AdminProducts() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,20 +90,11 @@ export default function AdminProducts() {
   const [newColor, setNewColor] = useState('#000000');
   const [newImageUrl, setNewImageUrl] = useState('');
   const [imageInputMode, setImageInputMode] = useState<'url' | 'file'>('file');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { uploadFile, isUploading, progress } = useUpload({
-    basePath: '/api/storage',
-    onSuccess: (res) => {
-      // Use the public Supabase URL returned from the server
-      const servedUrl = (res as any).publicUrl || `/api/storage${res.objectPath}`;
-      setForm(prev => ({ ...prev, images: [...prev.images, servedUrl] }));
-    },
-    onError: (err) => {
-      console.error('Upload failed:', err);
-    },
-  });
 
   useEffect(() => { loadProducts(); }, []);
 
@@ -102,6 +115,7 @@ export default function AdminProducts() {
   const openAdd = () => {
     setForm({ ...DEFAULT_FORM });
     setNewImageUrl('');
+    setUploadError(null);
     setModal({ open: true, mode: 'add' });
   };
 
@@ -123,10 +137,11 @@ export default function AdminProducts() {
       isActive: p.isActive,
     });
     setNewImageUrl('');
+    setUploadError(null);
     setModal({ open: true, mode: 'edit', product: p });
   };
 
-  const closeModal = () => { setModal({ open: false, mode: 'add' }); setSaving(false); };
+  const closeModal = () => { setModal({ open: false, mode: 'add' }); setSaving(false); setUploadError(null); };
 
   const updateForm = (key: keyof FormState, value: any) =>
     setForm(prev => ({ ...prev, [key]: value }));
@@ -157,6 +172,24 @@ export default function AdminProducts() {
 
   const removeImage = (url: string) =>
     setForm(prev => ({ ...prev, images: prev.images.filter(img => img !== url) }));
+
+  const handleFileUpload = async (files: File[]) => {
+    setUploadError(null);
+    for (const file of files) {
+      setIsUploading(true);
+      setUploadProgress(0);
+      try {
+        const publicUrl = await uploadImageToSupabase(file, (pct) => setUploadProgress(pct));
+        setForm(prev => ({ ...prev, images: [...prev.images, publicUrl] }));
+      } catch (err: any) {
+        setUploadError(err.message || 'Upload failed. Try adding via URL instead.');
+      } finally {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }
+    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const discountPct = form.originalPrice && form.price
     ? Math.round((1 - Number(form.price) / Number(form.originalPrice)) * 100)
@@ -624,39 +657,51 @@ export default function AdminProducts() {
                   <h3 className="text-[10px] uppercase tracking-[0.2em] text-[#999999] mb-4">Product Images</h3>
                   <p className="text-[11px] text-[#AAAAAA] mb-4">First image is the primary. Add multiple images for a product gallery.</p>
 
-                  {/* Image list */}
+                  {/* Image previews */}
                   <div className="space-y-2 mb-5">
-                    {form.images.map((imgUrl, idx) => (
-                      <div key={idx} className="flex items-center gap-3 p-3 border border-[#EAEAEA] bg-[#FAFAFA] group/img">
-                        <div className="w-10 h-12 bg-[#EAEAEA] overflow-hidden shrink-0 border border-[#E0E0E0]">
-                          <img src={imgUrl} alt={`Image ${idx + 1}`} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.opacity = '0.3'; }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[9px] uppercase tracking-[0.15em] text-[#AAAAAA] mb-0.5">{idx === 0 ? 'Primary Image' : `Image ${idx + 1}`}</p>
-                          <p className="text-[11px] text-[#666] truncate">{imgUrl}</p>
-                        </div>
-                        <button type="button" onClick={() => removeImage(imgUrl)} className="w-7 h-7 flex items-center justify-center border border-transparent group-hover/img:border-[#EAEAEA] hover:border-black! transition-colors shrink-0 text-[#AAAAAA] hover:text-black">
-                          <X size={11} />
-                        </button>
+                    {form.images.length > 0 && (
+                      <div className="grid grid-cols-4 gap-2 mb-3">
+                        {form.images.map((imgUrl, idx) => (
+                          <div key={idx} className="relative group/img aspect-[3/4] bg-[#F5F5F5] overflow-hidden border border-[#EAEAEA]">
+                            <img
+                              src={imgUrl}
+                              alt={`Image ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={e => { (e.target as HTMLImageElement).src = ''; (e.target as HTMLImageElement).style.opacity = '0.2'; }}
+                            />
+                            {idx === 0 && (
+                              <span className="absolute bottom-1 left-1 right-1 text-center text-[8px] uppercase tracking-[0.1em] bg-black/70 text-white py-0.5">Primary</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(imgUrl)}
+                              className="absolute top-1 right-1 w-5 h-5 bg-black/80 text-white rounded-full hidden group-hover/img:flex items-center justify-center transition-all"
+                            >
+                              <X size={9} />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                     {form.images.length === 0 && !isUploading && (
                       <div className="flex flex-col items-center justify-center h-24 border border-dashed border-[#DDDDDD] bg-[#FAFAFA] text-[#CCCCCC]">
                         <ImagePlus size={20} strokeWidth={1} className="mb-2" />
                         <span className="text-[11px]">No images yet</span>
                       </div>
                     )}
-                    {/* Upload progress */}
                     {isUploading && (
                       <div className="p-4 border border-[#EAEAEA] bg-[#FAFAFA]">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-[11px] uppercase tracking-[0.1em] text-[#666]">Uploading…</span>
-                          <span className="text-[11px] text-[#999]">{progress}%</span>
+                          <span className="text-[11px] text-[#999]">{uploadProgress}%</span>
                         </div>
                         <div className="h-[2px] bg-[#EAEAEA] overflow-hidden">
-                          <div className="h-full bg-black transition-all duration-300" style={{ width: `${progress}%` }} />
+                          <div className="h-full bg-black transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                         </div>
                       </div>
+                    )}
+                    {uploadError && (
+                      <p className="text-[11px] text-red-500 bg-red-50 border border-red-100 px-3 py-2">{uploadError}</p>
                     )}
                   </div>
 
@@ -691,10 +736,7 @@ export default function AdminProducts() {
                         className="hidden"
                         onChange={async (e) => {
                           const files = Array.from(e.target.files || []);
-                          for (const file of files) {
-                            await uploadFile(file);
-                          }
-                          if (fileInputRef.current) fileInputRef.current.value = '';
+                          if (files.length > 0) await handleFileUpload(files);
                         }}
                       />
                       <button
@@ -704,7 +746,7 @@ export default function AdminProducts() {
                         className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-[#DDDDDD] py-6 text-[12px] uppercase tracking-[0.15em] text-[#888] hover:border-black hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Upload size={16} strokeWidth={1.5} />
-                        {isUploading ? `Uploading (${progress}%)…` : 'Click to choose image files'}
+                        {isUploading ? `Uploading (${uploadProgress}%)…` : 'Click to choose image files'}
                       </button>
                       <p className="text-[10px] text-[#BBBBBB] mt-2 text-center">Supports JPG, PNG, WebP · Multiple files allowed</p>
                     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRoute } from 'wouter';
 import { useGetProduct } from '@workspace/api-client-react';
 import { products as hardcodedProducts, Product } from '../data/products';
@@ -7,9 +7,11 @@ import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCartStore } from '../stores/cartStore';
 import { useWishlistStore } from '../stores/wishlistStore';
 import { useUIStore } from '../stores/uiStore';
-import { Heart, ChevronRight, ZoomIn, X } from 'lucide-react';
+import { Heart, ChevronRight, X, ChevronLeft, ChevronRight as ChevronRightIcon } from 'lucide-react';
 import { Link } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const ZOOM_LEVEL = 2.8;
 
 export default function ProductDetail() {
   const [, params] = useRoute('/products/:slug');
@@ -20,9 +22,14 @@ export default function ProductDetail() {
 
   const [activeSize, setActiveSize] = useState<string>('');
   const [activeColor, setActiveColor] = useState<string>('');
-  const [zoomed, setZoomed] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // Hover zoom state
+  const [isZoomActive, setIsZoomActive] = useState(false);
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 }); // 0–1 normalized
+  const imgContainerRef = useRef<HTMLDivElement>(null);
 
   const { addItem } = useCartStore();
   const { toggle, isInWishlist } = useWishlistStore();
@@ -37,7 +44,6 @@ export default function ProductDetail() {
     }
   }, [product]);
 
-  // Build the full images array: use product.images if available, else fall back to imageUrl
   const allImages: string[] = product
     ? (product.images && product.images.length > 0
         ? product.images
@@ -47,11 +53,25 @@ export default function ProductDetail() {
     : [];
   const activeImage = allImages[activeImageIndex] ?? null;
 
+  // Keyboard listeners for lightbox
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => e.key === 'Escape' && setZoomed(false);
-    if (zoomed) window.addEventListener('keydown', handler);
+    const handler = (e: KeyboardEvent) => {
+      if (!lightboxOpen) return;
+      if (e.key === 'Escape') setLightboxOpen(false);
+      if (e.key === 'ArrowRight') setActiveImageIndex(i => (i + 1) % allImages.length);
+      if (e.key === 'ArrowLeft') setActiveImageIndex(i => (i - 1 + allImages.length) % allImages.length);
+    };
+    window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [zoomed]);
+  }, [lightboxOpen, allImages.length]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imgContainerRef.current || !activeImage) return;
+    const rect = imgContainerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    setZoomPos({ x, y });
+  }, [activeImage]);
 
   if (isLoading && !product) {
     return (
@@ -92,94 +112,82 @@ export default function ProductDetail() {
     ? Math.round((1 - Number(product.price) / Number(product.originalPrice)) * 100)
     : null;
 
-  const MainImage = () => (
-    <div
-      className="w-full aspect-[3/4] relative cursor-zoom-in group/img overflow-hidden"
-      onClick={() => setZoomed(true)}
-    >
-      {activeImage ? (
-        <motion.img
-          key={activeImage}
-          src={activeImage}
-          alt={product.name}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.25 }}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <FigureSVG
-          figType={product.figType}
-          ca={product.figColorA}
-          cb={product.figColorB}
-          className="w-full h-full"
-        />
-      )}
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 bg-black/5">
-        <div className="w-10 h-10 bg-white/80 backdrop-blur flex items-center justify-center">
-          <ZoomIn size={18} strokeWidth={1.5} />
-        </div>
-      </div>
-    </div>
-  );
+  // Zoom background position: maps 0–1 to the right CSS background-position percentages
+  const bgPosX = zoomPos.x * 100;
+  const bgPosY = zoomPos.y * 100;
 
   return (
     <div className="w-full min-h-[100dvh] pt-[64px] bg-white text-black">
 
-      {/* Zoom Lightbox */}
+      {/* Lightbox */}
       <AnimatePresence>
-        {zoomed && (
+        {lightboxOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setZoomed(false)}
-            className="fixed inset-0 bg-black/90 z-[3000] flex items-center justify-center p-8 cursor-zoom-out"
+            onClick={() => setLightboxOpen(false)}
+            className="fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center"
           >
             <motion.div
-              initial={{ scale: 0.85, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className="relative max-w-[600px] w-full max-h-[85vh] flex items-center justify-center"
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              className="relative max-h-[90vh] flex items-center justify-center"
               onClick={e => e.stopPropagation()}
             >
               {activeImage ? (
                 <img
                   src={activeImage}
                   alt={product.name}
-                  className="w-full h-full object-contain max-h-[85vh]"
+                  className="max-h-[85vh] max-w-[90vw] object-contain select-none"
+                  draggable={false}
                 />
               ) : (
-                <div className="w-full aspect-[3/4]">
+                <div className="w-[480px] aspect-[3/4]">
                   <FigureSVG figType={product.figType} ca={product.figColorA} cb={product.figColorB} className="w-full h-full" />
                 </div>
               )}
             </motion.div>
 
-            {/* Lightbox thumbnail nav (if multiple images) */}
+            {/* Prev / Next */}
             {allImages.length > 1 && (
-              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2">
-                {allImages.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={e => { e.stopPropagation(); setActiveImageIndex(i); }}
-                    className={`w-12 h-14 overflow-hidden border-2 transition-all ${i === activeImageIndex ? 'border-white' : 'border-white/30 opacity-60 hover:opacity-100'}`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+              <>
+                <button
+                  onClick={e => { e.stopPropagation(); setActiveImageIndex(i => (i - 1 + allImages.length) % allImages.length); }}
+                  className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                >
+                  <ChevronLeft size={22} className="text-white" strokeWidth={1.5} />
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); setActiveImageIndex(i => (i + 1) % allImages.length); }}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                >
+                  <ChevronRightIcon size={22} className="text-white" strokeWidth={1.5} />
+                </button>
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+                  {allImages.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={e => { e.stopPropagation(); setActiveImageIndex(i); }}
+                      className={`w-12 h-14 overflow-hidden border-2 transition-all ${i === activeImageIndex ? 'border-white' : 'border-white/25 opacity-50 hover:opacity-90'}`}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
 
             <button
-              onClick={() => setZoomed(false)}
+              onClick={() => setLightboxOpen(false)}
               className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
             >
               <X size={20} strokeWidth={1.5} className="text-white" />
             </button>
-            <p className="absolute top-6 left-1/2 -translate-x-1/2 text-white/40 text-[11px] uppercase tracking-[0.2em]">
-              Click or press Esc to close
+            <p className="absolute top-7 left-1/2 -translate-x-1/2 text-white/30 text-[10px] uppercase tracking-[0.25em] pointer-events-none">
+              {allImages.length > 1 ? `${activeImageIndex + 1} / ${allImages.length}` : 'Click or Esc to close'}
             </p>
           </motion.div>
         )}
@@ -201,13 +209,13 @@ export default function ProductDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 max-w-[1600px] mx-auto min-h-[calc(100vh-140px)]">
 
-        {/* Left: Visuals — thumbnail strip + main image */}
+        {/* Left: Visuals */}
         <div className="flex bg-[#F5F5F5] relative overflow-hidden min-h-[500px]">
           {!activeImage && (
             <div className="absolute inset-0" style={{ background: product.bgGradient, opacity: 0.6 }} />
           )}
 
-          {/* Thumbnail strip (only shown when 2+ images) */}
+          {/* Thumbnail strip */}
           {allImages.length > 1 && (
             <div className="flex flex-col gap-2 p-4 z-10 shrink-0 overflow-y-auto max-h-[calc(100vh-64px)] scrollbar-hide">
               {allImages.map((img, i) => (
@@ -224,15 +232,70 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {/* Main image */}
+          {/* Main image + hover zoom */}
           <div className="flex-1 flex items-center justify-center p-8 md:p-10 lg:p-16 relative z-10">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-              className="w-full max-w-[480px]"
+              className="w-full max-w-[480px] relative"
             >
-              <MainImage />
+              {/* Image container with hover zoom */}
+              <div
+                ref={imgContainerRef}
+                className={`w-full aspect-[3/4] relative overflow-hidden group/img ${activeImage ? 'cursor-crosshair' : 'cursor-default'}`}
+                onMouseEnter={() => { if (activeImage) setIsZoomActive(true); }}
+                onMouseLeave={() => setIsZoomActive(false)}
+                onMouseMove={handleMouseMove}
+                onClick={() => { if (activeImage) setLightboxOpen(true); }}
+              >
+                {activeImage ? (
+                  <motion.img
+                    key={activeImage}
+                    src={activeImage}
+                    alt={product.name}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.25 }}
+                    className="w-full h-full object-cover select-none"
+                    draggable={false}
+                  />
+                ) : (
+                  <FigureSVG
+                    figType={product.figType}
+                    ca={product.figColorA}
+                    cb={product.figColorB}
+                    className="w-full h-full"
+                  />
+                )}
+
+                {/* Zoom lens overlay — follows cursor */}
+                {activeImage && (
+                  <div
+                    className={`absolute inset-0 transition-opacity duration-150 pointer-events-none ${isZoomActive ? 'opacity-100' : 'opacity-0'}`}
+                    style={{
+                      backgroundImage: `url(${activeImage})`,
+                      backgroundSize: `${ZOOM_LEVEL * 100}%`,
+                      backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  />
+                )}
+
+                {/* Hint label */}
+                {activeImage && (
+                  <div className={`absolute bottom-3 right-3 px-2 py-1 bg-black/60 text-white text-[9px] uppercase tracking-[0.15em] pointer-events-none transition-opacity duration-200 ${isZoomActive ? 'opacity-0' : 'opacity-100 group-hover/img:opacity-0'}`}>
+                    Hover to zoom
+                  </div>
+                )}
+              </div>
+
+              {/* Click-to-enlarge hint */}
+              {activeImage && !isZoomActive && (
+                <p className="text-center text-[9px] uppercase tracking-[0.2em] text-[#BBBBBB] mt-3 select-none">
+                  Click to enlarge
+                </p>
+              )}
             </motion.div>
           </div>
 
