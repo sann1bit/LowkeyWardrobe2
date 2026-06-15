@@ -1,0 +1,140 @@
+Build a fully self-contained FAQ/help chatbot widget — NO external APIs, NO AI 
+model calls. All responses come from a local knowledge base (a JS/JSON file) 
+using keyword/intent matching. Match the existing minimalist luxury aesthetic: 
+off-white (#FAFAF8) / near-black (#111111) palette, serif-italic display font 
+for headers, wide-letter-spaced uppercase sans-serif for buttons/labels, sharp 
+flat corners, no colorful or rounded elements.
+
+First inspect the codebase to find the framework and styling conventions, then 
+implement the following.
+
+=== 1. WIDGET UI ===
+- Floating circular button, bottom-right, fixed position (~52px), monochrome 
+  chat-bubble or "L" monogram icon. Check the codebase doesn't already have a 
+  floating element (e.g. a WhatsApp button) in that corner — if so, stack them 
+  with spacing rather than overlapping.
+- On click, opens a panel: 380px wide on desktop, full-screen on mobile
+  - Header: "Ask Lowkey" in serif-italic, near-black on off-white, with a 
+    close (×) icon
+  - Scrollable message area
+  - Quick-reply button row (section 3)
+  - Text input + send button, sharp-edged, matching site input styling
+- Message bubbles: no heavy rounded shapes. User messages right-aligned with 
+  a thin border; bot messages left-aligned with a subtle #ECECEC background. 
+  Max 2px corner radius.
+- Typing indicator: three small dots pulsing in sequence (opacity 0.3→1→0.3), 
+  grayscale, using the same timing/tokens as the site's existing shimmer 
+  animation for consistency.
+- Open/close animation: slide up + fade, 250ms ease-in-out.
+- Auto-nudge: after ~5s on first visit per session, show a small notification 
+  bubble — "Need help with sizing, shipping, or your order?" — don't repeat 
+  on every page load.
+
+=== 2. KNOWLEDGE BASE STRUCTURE ===
+Create a single data file (e.g. chatbotData.js) as an array of entries:
+{
+  id, 
+  topic, 
+  keywords: [...],   // include generous synonyms/variations per topic
+  question,          // display text for quick-reply button
+  answer,            // supports line breaks / simple lists / links
+  followUps: [...]   // ids of related entries to suggest after this answer
+}
+
+Matching: lowercase + strip punctuation from user input, score keyword overlap 
+against each entry, return the highest match above a minimum threshold. Below 
+threshold → fallback (section 6). After each bot answer, show 2–3 quick-reply 
+buttons from that entry's followUps.
+
+=== 3. MAIN QUICK-REPLY MENU (shown on open) ===
+TRACK MY ORDER · SHIPPING & DELIVERY · PAYMENT METHODS · SIZE GUIDE · 
+RETURNS & EXCHANGES · CONTACT US
+
+=== 4. PRE-LOADED CONTENT ===
+
+SHIPPING & DELIVERY
+- Domestic delivery: 3–5 business days across Pakistan
+- FREE shipping on orders over PKR 50,000 (matches site marquee)
+- Standard shipping fee under that threshold: [PLACEHOLDER: e.g. PKR 250]
+- Order processing time before dispatch: [PLACEHOLDER: e.g. 1–2 business days]
+- International shipping: [PLACEHOLDER: available/not, timeframe, cost]
+
+PAYMENT METHODS
+- JazzCash: send total to [PLACEHOLDER: JazzCash number], then share the 
+  transaction ID via WhatsApp [PLACEHOLDER: WhatsApp number] or enter it at 
+  checkout
+- EasyPaisa: send total to [PLACEHOLDER: EasyPaisa number], same confirmation 
+  process
+- Bank Transfer: [PLACEHOLDER: bank name, account title, account number, IBAN]
+- Cash on Delivery (COD): available for orders [PLACEHOLDER: under what amount, 
+  if any], COD fee: [PLACEHOLDER: amount or "none"]
+- Cards: Visa/Mastercard accepted via secure checkout
+
+HOW TO PAY (step-by-step)
+1. Add items to cart and go to checkout
+2. Choose your payment method
+3. JazzCash/EasyPaisa: transfer the order total to the number shown, then 
+   enter the transaction ID at checkout (or send a screenshot via WhatsApp)
+4. COD: confirm your order, pay the courier on delivery
+5. You'll receive confirmation via [PLACEHOLDER: email/WhatsApp]
+
+ORDER TRACKING
+- "Go to Account → Order History, or our Track Order page, and enter your 
+  order number + email"
+- Timeline: Processing (1–2 days) → Shipped (tracking number sent) → 
+  Delivered (3–5 days domestic)
+- Urgent: WhatsApp us at [PLACEHOLDER: number] with your order number
+
+ABOUT LOWKEY WARDROBE
+- [PLACEHOLDER: brand story — 2-3 sentences on what the brand is/stands for]
+- Customer service hours: [PLACEHOLDER: e.g. Mon–Sat, 10am–7pm PKT]
+- Contact: [PLACEHOLDER: email] / [PLACEHOLDER: WhatsApp number]
+- Instagram: [PLACEHOLDER: handle]
+
+SIZE GUIDES (use these as a template structure — replace with real measurements)
+Clothing (Men's):
+  S  — Chest 36–38in / Waist 30–32in
+  M  — Chest 39–41in / Waist 33–35in
+  L  — Chest 42–44in / Waist 36–38in
+  XL — Chest 45–47in / Waist 39–41in
+Shoes (conversion):
+  UK 7 / EU 41 / US 8
+  UK 8 / EU 42 / US 9
+  UK 9 / EU 43 / US 10
+  UK 10 / EU 44 / US 11
+Accessories: [PLACEHOLDER: belt sizing, glove sizing notes]
+Add: "Between sizes? We recommend sizing up for a relaxed fit, true to size 
+for tailored."
+
+RETURNS & EXCHANGES
+- 30-day return window from delivery date (matches site marquee)
+- Items must be unworn, tags attached, original packaging
+- Sale/archive items: [PLACEHOLDER: final sale or returnable?]
+- To initiate: [PLACEHOLDER: email/WhatsApp/account portal]
+
+GIFT WRAPPING
+- "All orders include complimentary gift wrapping automatically — no need to 
+  request it." (matches marquee)
+
+=== 5. FOLLOW-UP SUGGESTIONS (examples) ===
+- After SHIPPING answer → suggest "PAYMENT METHODS" and "TRACK MY ORDER"
+- After SIZE GUIDE → suggest "RETURNS & EXCHANGES"
+- After PAYMENT METHODS → suggest "HOW TO PAY" step-by-step
+
+=== 6. FALLBACK / ESCALATION ===
+If no entry matches confidently:
+"I'm not sure I have that one — but our team can help directly. Message us on 
+WhatsApp [PLACEHOLDER: number] or email [PLACEHOLDER: email]."
+Include a monochrome WhatsApp icon/outline button linking to wa.me/[number].
+
+=== 7. PERSISTENCE & POLISH ===
+- Store conversation + open/closed state in sessionStorage (persists across 
+  page navigation, resets on new session)
+- Respect prefers-reduced-motion: disable slide/fade, typing dots become 
+  static "..."
+- Fully keyboard accessible: Tab through quick replies, Enter to send, Esc 
+  to close
+- Reuse existing design tokens (colors, fonts, letter-spacing, corner radius) 
+  so this feels native, not bolted on
+
+Mark every [PLACEHOLDER] clearly so I can locate and fill them in afterward.

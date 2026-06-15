@@ -20,6 +20,7 @@ import { SearchOverlay } from "./components/SearchOverlay";
 import { Toast } from "./components/Toast";
 import { PageLoader } from "./components/PageLoader";
 import { RouteProgress } from "./components/RouteProgress";
+import { ChatWidget } from "./components/ChatWidget";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ function App() {
             <CartDrawer />
             <SearchOverlay />
             <Toast />
+            <ChatWidget />
           </div>
         )}
       </WouterRouter>
