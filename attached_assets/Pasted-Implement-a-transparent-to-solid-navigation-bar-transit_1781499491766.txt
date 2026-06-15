@@ -1,0 +1,67 @@
+Implement a transparent-to-solid navigation bar transition across the site, 
+matching the existing minimalist luxury aesthetic (serif-italic logo/headings, 
+wide-letter-spaced uppercase nav labels, sharp/flat edges, monochrome palette, 
+no soft shadows or rounded corners).
+
+First inspect the codebase to find the current header/nav component and its 
+styling approach (Tailwind/CSS modules/plain CSS), then implement the following 
+using the same conventions.
+
+=== 1. HOMEPAGE HERO STATE ===
+When the homepage loads and the hero section is in view:
+- Nav background: fully transparent (no fill, no border, no shadow)
+- Logo "LOWKEY WARDROBE" and all nav links/icons: off-white (#FAFAF8), 
+  same font weights/letter-spacing as current
+- Position: fixed/absolute over the hero image, full width
+
+=== 2. SCROLLED / NON-HERO STATE ===
+Once the user scrolls past the hero (or on any page without a dark hero, 
+e.g. category/product/cart pages):
+- Nav background transitions to solid off-white (#FAFAF8)
+- Logo and nav links/icons transition to near-black (#111111)
+- Add a 1px bottom border in a very light gray (#EAEAEA) — thin, almost 
+  invisible, just enough to separate nav from content
+- No drop shadow, no blur — keep the flat, sharp aesthetic
+
+=== 3. TRANSITION ===
+- Animate background-color and text/icon color together over 250-300ms, 
+  ease-in-out
+- Trigger point: when scroll position passes ~80% of the hero's height 
+  (or a fixed pixel threshold, whichever is cleaner to implement)
+- No layout shift — nav height and padding stay identical in both states
+
+=== 4. ICONS (search, wishlist, cart, account) ===
+- Inherit the same color transition as the logo/nav text (off-white → 
+  near-black)
+- Cart badge (item count), if present: small, minimal — a thin-outlined 
+  circle with the number in the same monochrome palette, no colored 
+  badges (no red dots)
+
+=== 5. HOVER / ACTIVE STATES ===
+- On hover, nav links get a subtle effect consistent with the rest of 
+  the site — e.g. a thin underline that draws in from the left (200ms), 
+  or a slight increase in letter-spacing. Avoid color changes, glows, 
+  or background fills on hover — keep it quiet and elegant
+- Active/current page link can have a permanent thin underline in the 
+  current text color
+
+=== 6. MOBILE ===
+- On smaller viewports, the nav collapses to logo + hamburger/menu icon 
+  + cart icon
+- Apply the same transparent-to-solid logic: transparent + off-white 
+  icons over the hero, solid off-white + near-black icons once scrolled 
+  or on non-hero pages
+- Mobile menu overlay (when opened): full-screen or full-width panel in 
+  off-white (#FAFAF8) with near-black serif-italic links, generous 
+  vertical spacing, no rounded corners
+
+=== 7. PAGES WITHOUT A HERO ===
+For any page where the nav sits directly on top of content from the 
+first frame (no full-bleed dark image), render the nav in its solid 
+state immediately — never start transparent on a light background, 
+since there'd be nothing for it to contrast against.
+
+=== 8. CONSISTENCY CHECK ===
+Search the codebase for any existing nav background colors, box-shadows, 
+or scroll-listeners related to the header, and consolidate them into this 
+single transition system so behavior is identical across every page.
