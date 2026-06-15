@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useListProducts } from '@workspace/api-client-react';
 import { products as hardcodedProducts } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
+import { ProductCardSkeleton } from '../components/ProductCardSkeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, ChevronDown, Search, X } from 'lucide-react';
 
@@ -232,7 +233,7 @@ export default function Products() {
         <div className="mt-8">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[2px] bg-[#EAEAEA] border border-[#EAEAEA]">
-              {Array.from({ length: 8 }).map((_, i) => <div key={i} className="bg-white aspect-[3/4] animate-pulse bg-[#F5F5F5]" />)}
+              {Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)}
             </div>
           ) : products.length === 0 ? (
             <div className="py-32 text-center">

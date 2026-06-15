@@ -96,7 +96,7 @@ export default function AdminLogin() {
               disabled={loading}
               className="w-full bg-black text-white py-4 text-[11px] uppercase tracking-[0.15em] hover:bg-[#333333] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
             >
-              {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Signing in...</> : 'Sign In'}
+              {loading ? <><span className="spinner" style={{ color: 'white' }} /> Signing in...</> : 'Sign In'}
             </button>
           </form>
         </div>

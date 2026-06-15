@@ -18,6 +18,8 @@ import { Footer } from "./components/Footer";
 import { CartDrawer } from "./components/CartDrawer";
 import { SearchOverlay } from "./components/SearchOverlay";
 import { Toast } from "./components/Toast";
+import { PageLoader } from "./components/PageLoader";
+import { RouteProgress } from "./components/RouteProgress";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <PageLoader />
+        <RouteProgress />
         {adminRoute ? (
           <Router />
         ) : (

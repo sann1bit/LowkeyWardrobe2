@@ -71,7 +71,7 @@ export default function AdminNewsletter() {
 
         {loading ? (
           <div className="flex justify-center py-24">
-            <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            <span className="spinner spinner--lg" style={{ color: '#111' }} />
           </div>
         ) : filtered.length === 0 ? (
           <div className="bg-white border border-[#EAEAEA] p-16 text-center">

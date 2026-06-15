@@ -42,7 +42,7 @@ export default function AdminDashboard() {
     <AdminLayout title="Dashboard">
       {loading ? (
         <div className="flex items-center justify-center py-24">
-          <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+          <span className="spinner spinner--lg" style={{ color: '#111' }} />
         </div>
       ) : (
         <div className="space-y-8">

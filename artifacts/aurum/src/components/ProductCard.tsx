@@ -7,6 +7,7 @@ import { useWishlistStore } from '../stores/wishlistStore';
 import { useCartStore } from '../stores/cartStore';
 import { useUIStore } from '../stores/uiStore';
 import { motion } from 'framer-motion';
+import { Skeleton } from './Skeleton';
 
 interface ProductCardProps {
   product: Product;
@@ -18,6 +19,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { showToast } = useUIStore();
   const isWishlisted = isInWishlist(product.id);
   const [activeColor, setActiveColor] = useState(product.colors[0]);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -47,7 +49,16 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="group cursor-pointer block h-full flex flex-col relative" data-testid={`product-card-${product.id}`}>
         <div className="relative aspect-[3/4] overflow-hidden bg-[#F0F0F0] w-full">
           {primaryImage ? (
-            <img src={primaryImage} alt={product.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
+            <>
+              {!imgLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
+              <img
+                src={primaryImage}
+                alt={product.name}
+                onLoad={() => setImgLoaded(true)}
+                className="w-full h-full object-cover group-hover:scale-[1.03] transition-all duration-700 ease-out"
+                style={{ opacity: imgLoaded ? 1 : 0, transition: 'opacity 400ms ease-out, transform 700ms ease-out' }}
+              />
+            </>
           ) : (
             <>
               <div className="absolute inset-0" style={{ background: product.bgGradient }} />

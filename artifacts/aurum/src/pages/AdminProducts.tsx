@@ -323,7 +323,7 @@ export default function AdminProducts() {
         {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            <span className="spinner spinner--lg" style={{ color: '#111' }} />
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-24 text-[#999999]">
@@ -800,7 +800,7 @@ export default function AdminProducts() {
                   className="flex-1 bg-black text-white py-3.5 text-[11px] uppercase tracking-[0.15em] hover:bg-[#333333] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {saving ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="spinner" style={{ color: 'white' }} />
                   ) : (
                     <><Check size={14} /> {modal.mode === 'add' ? 'Create Product' : 'Save Changes'}</>
                   )}
@@ -842,7 +842,7 @@ export default function AdminProducts() {
                   disabled={saving}
                   className="flex-1 bg-black text-white py-3 text-[11px] uppercase tracking-[0.15em] hover:bg-[#333333] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : 'Delete'}
+                  {saving ? <span className="spinner" style={{ color: 'white' }} /> : 'Delete'}
                 </button>
               </div>
             </motion.div>

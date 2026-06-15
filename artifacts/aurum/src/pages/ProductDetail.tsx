@@ -75,8 +75,30 @@ export default function ProductDetail() {
 
   if (isLoading && !product) {
     return (
-      <div className="w-full min-h-[100dvh] pt-[120px] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-full min-h-[100dvh] pt-[120px] pb-24 bg-white">
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+            <div className="skeleton aspect-[3/4] w-full" />
+            <div className="pt-4 flex flex-col gap-5">
+              <div className="skeleton h-[10px] w-[35%] rounded-[2px]" />
+              <div className="skeleton h-[38px] w-[80%] rounded-[2px]" />
+              <div className="skeleton h-[20px] w-[22%] rounded-[2px]" />
+              <div className="h-[1px] bg-[#EAEAEA] my-2" />
+              <div className="flex flex-col gap-2">
+                <div className="skeleton h-[11px] w-full rounded-[2px]" />
+                <div className="skeleton h-[11px] w-[90%] rounded-[2px]" />
+                <div className="skeleton h-[11px] w-[75%] rounded-[2px]" />
+              </div>
+              <div className="h-[1px] bg-[#EAEAEA] my-2" />
+              <div className="flex gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="skeleton h-[36px] w-[48px] rounded-[2px]" />
+                ))}
+              </div>
+              <div className="skeleton h-[52px] w-full rounded-[2px] mt-4" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

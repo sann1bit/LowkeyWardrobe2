@@ -1,0 +1,100 @@
+Implement a unified, premium loading system across the entire site, replacing 
+ALL existing spinners, "Loading..." text, and blank-flash states. The brand 
+(Lowkey Wardrobe) is minimalist luxury: monochrome, serif-italic display type, 
+wide-letter-spaced uppercase labels, sharp/minimal corner radii, high-contrast 
+black & white photography. The loading system must feel like an extension of 
+this aesthetic — slow, calm, monochrome motion, never colorful or bouncy.
+
+First, inspect the codebase to identify the framework, styling approach 
+(Tailwind/CSS modules/plain CSS), and where existing loading states live, then 
+implement the following using those same conventions.
+
+=== 1. DESIGN TOKENS ===
+Add to the global stylesheet/theme:
+
+:root {
+  --skeleton-base-light: #ECECEC;
+  --skeleton-shine-light: #F8F8F8;
+  --skeleton-base-dark: #1C1C1C;
+  --skeleton-shine-dark: #2E2E2E;
+  --loader-bg: #FAFAF8;
+  --loader-line: #111111;
+  --loader-line-inverse: #FAFAF8;
+  --motion-fast: 250ms;
+  --motion-base: 400ms;
+  --shimmer-duration: 1.8s;
+}
+
+=== 2. SHIMMER ANIMATION ===
+@keyframes shimmer {
+  0% { background-position: -150% 0; }
+  100% { background-position: 150% 0; }
+}
+.skeleton {
+  background: linear-gradient(100deg, var(--skeleton-base-light) 30%, 
+    var(--skeleton-shine-light) 50%, var(--skeleton-base-light) 70%);
+  background-size: 200% 100%;
+  animation: shimmer var(--shimmer-duration) ease-in-out infinite;
+  border-radius: 2px; /* match the site's sharp, minimal corners */
+}
+.skeleton--dark {
+  background: linear-gradient(100deg, var(--skeleton-base-dark) 30%, 
+    var(--skeleton-shine-dark) 50%, var(--skeleton-base-dark) 70%);
+}
+
+Create a reusable <Skeleton /> component with props: width, height, 
+variant ("light" | "dark"), and shape ("rect" | "circle" | "text-line"). 
+Use this everywhere instead of one-off divs.
+
+=== 3. FULL-PAGE LOADER (first load / hard refresh only) ===
+Full-screen overlay, background = --loader-bg. Centered, show "LOWKEY 
+WARDROBE" in the same serif-italic, letter-spaced style as the site logo. 
+Below it, a 1px line that animates from 0% to 100% width over ~1.2s 
+(left to right, ease-in-out). Once the page is ready, fade the whole 
+overlay out over 400ms. Enforce a minimum display time of ~500ms so it 
+never flickers on fast connections.
+
+=== 4. ROUTE / PAGE TRANSITIONS ===
+On every navigation: 
+- Show a 2px progress line fixed to the top of the viewport, animating 
+  left-to-right. Color = --loader-line on light pages, --loader-line-inverse 
+  on dark pages/sections.
+- Fade out the outgoing page content (200ms) and fade in the new content 
+  (250ms) — no hard cuts.
+
+=== 5. COMPONENT-LEVEL SKELETONS ===
+Apply <Skeleton /> in these exact spots:
+- Hero/banner: full-bleed skeleton (dark variant for dark hero sections) 
+  matching the image's exact aspect ratio
+- Product grid cards: image skeleton (4:5 ratio) + two text-line skeletons 
+  below (title ~70% width, price ~30% width)
+- Product detail page: large image skeleton + skeleton lines for title, 
+  price, description, and skeleton "pills" for size/color swatches
+- Cart & wishlist drawers: 2–3 skeleton rows (small square image + two 
+  text lines) while items load
+- Search results & filtered grids: same card skeleton as product grid, 
+  showing while results resolve
+- Category landing tiles (Clothing/Shoes/Accessories style sections): 
+  skeleton matching each tile's exact dimensions and variant (light/dark)
+
+=== 6. IMAGE LOADING ===
+Every <img> renders its matching <Skeleton shape="rect" /> at the image's 
+aspect ratio until loaded, then crossfades (400ms ease-out) from skeleton 
+to image — no layout shift.
+
+=== 7. BUTTON / ACTION LOADING STATES ===
+For async actions (Add to Cart, Apply Filters, Checkout steps): disable 
+the button, keep its label, and show a small (14px) circular spinner — 
+single 1.5px stroke, currentColor, rotating 0.8s linear infinite. No 
+colored or filled spinners anywhere on the site.
+
+=== 8. ACCESSIBILITY ===
+Respect prefers-reduced-motion: when set, replace shimmer/progress-bar 
+animations with a simple opacity pulse (or static state), and remove 
+the route-transition fades.
+
+=== 9. CONSISTENCY CHECK ===
+Search the codebase for any existing spinner components, "Loading..." 
+strings, isLoading conditionals, or CSS spinner classes, and migrate 
+them all to this system so there is exactly ONE loading style used 
+everywhere.
