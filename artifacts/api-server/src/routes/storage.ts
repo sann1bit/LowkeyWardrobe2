@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import multer from "multer";
-import { getUploadSignedUrl, supabase } from "../lib/supabaseStorage";
+import { getUploadSignedUrl, supabase, ensureBucket } from "../lib/supabaseStorage";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
@@ -26,6 +26,8 @@ router.post(
 
     const { randomUUID } = await import("crypto");
     const objectName = `uploads/${randomUUID()}.${ext}`;
+
+    await ensureBucket();
 
     const { error } = await supabase.storage
       .from(BUCKET_NAME)

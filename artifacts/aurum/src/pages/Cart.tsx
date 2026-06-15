@@ -82,12 +82,12 @@ export default function Cart() {
                   </div>
 
                   <div className="col-span-1 md:col-span-2 text-left md:text-right hidden md:block">
-                    <span className="text-[15px] font-light">${item.price}</span>
+                    <span className="text-[15px] font-light">PKR {Number(item.price).toLocaleString()}</span>
                   </div>
 
                   <div className="col-span-1 md:col-span-2 flex justify-between md:block text-right">
                     <span className="md:hidden text-[13px] text-[#666666]">Total</span>
-                    <span className="text-[16px] font-medium md:font-light">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="text-[16px] font-medium md:font-light">PKR {(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 </div>
               ))}
@@ -101,22 +101,22 @@ export default function Cart() {
                 <div className="flex flex-col gap-4 text-[14px] font-light text-[#333333] mb-8">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${total().toFixed(2)}</span>
+                    <span>PKR {total().toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>{shipping() === 0 ? 'Free' : `$${shipping().toFixed(2)}`}</span>
+                    <span>{shipping() === 0 ? 'Complimentary' : `PKR ${shipping().toLocaleString()}`}</span>
                   </div>
                   {shipping() > 0 && (
                     <div className="text-[12px] text-[#999999] mt-[-8px]">
-                      Spend ${(250 - total()).toFixed(2)} more for free shipping
+                      Spend PKR {(50000 - total()).toLocaleString()} more for complimentary shipping
                     </div>
                   )}
                 </div>
 
                 <div className="border-t border-[#EAEAEA] pt-6 flex justify-between text-[18px] font-medium mb-8">
                   <span>Total</span>
-                  <span>${(total() + shipping()).toFixed(2)}</span>
+                  <span>PKR {(total() + shipping()).toLocaleString()}</span>
                 </div>
 
                 <button className="w-full bg-black text-white py-4 text-[11px] uppercase tracking-[0.15em] hover:bg-[#333333] transition-colors mb-4">

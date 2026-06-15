@@ -35,7 +35,7 @@ export default function AdminDashboard() {
     { label: 'Total Products', value: stats?.products ?? '—', icon: Package, color: 'text-black' },
     { label: 'Newsletter Subscribers', value: stats?.subscribers ?? '—', icon: Mail, color: 'text-black' },
     { label: 'Total Orders', value: stats?.orders ?? '—', icon: ShoppingBag, color: 'text-black' },
-    { label: 'Total Revenue', value: stats ? `$${stats.revenue.toLocaleString()}` : '—', icon: DollarSign, color: 'text-black' },
+    { label: 'Total Revenue', value: stats ? `PKR ${stats.revenue.toLocaleString()}` : '—', icon: DollarSign, color: 'text-black' },
   ];
 
   return (
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
                       <tr key={order.id} className="border-b border-[#F5F5F5] hover:bg-[#FAFAFA] transition-colors">
                         <td className="px-6 py-4 text-[12px] font-mono">{order.order_number}</td>
                         <td className="px-6 py-4 text-[13px]">{order.first_name} {order.last_name}</td>
-                        <td className="px-6 py-4 text-[13px]">${parseFloat(order.total).toFixed(2)}</td>
+                        <td className="px-6 py-4 text-[13px]">PKR {parseFloat(order.total).toLocaleString()}</td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 text-[10px] uppercase tracking-[0.1em] rounded ${statusColors[order.status] || 'bg-gray-100 text-gray-600'}`}>
                             {order.status}
