@@ -57,26 +57,33 @@ const DEFAULT_FORM = {
 type FormState = typeof DEFAULT_FORM;
 
 async function uploadImageToSupabase(file: File, onProgress?: (pct: number) => void): Promise<string> {
-  const res = await adminFetch('/api/storage/uploads/request-url', {
-    method: 'POST',
-    body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
-  });
-  if (!res.ok) throw new Error('Failed to get upload URL');
-  const { uploadURL, publicUrl } = await res.json();
+  const token = localStorage.getItem('admin_token');
+  return new Promise<string>((resolve, reject) => {
+    const formData = new FormData();
+    formData.append('file', file);
 
-  await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('PUT', uploadURL);
-    xhr.setRequestHeader('Content-Type', file.type);
+    xhr.open('POST', '/api/storage/uploads/file');
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
     };
-    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed: ${xhr.status}`)));
-    xhr.onerror = () => reject(new Error('Upload error'));
-    xhr.send(file);
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const { publicUrl } = JSON.parse(xhr.responseText);
+          resolve(publicUrl);
+        } catch {
+          reject(new Error('Invalid response from server'));
+        }
+      } else {
+        reject(new Error(`Upload failed (${xhr.status}): ${xhr.responseText}`));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Network error during upload'));
+    xhr.send(formData);
   });
-
-  return publicUrl;
 }
 
 export default function AdminProducts() {

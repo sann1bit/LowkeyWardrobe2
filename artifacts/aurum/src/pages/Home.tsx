@@ -102,15 +102,15 @@ export default function Home() {
           onClick={() => setLocation('/products?category=clothing')}
           className="group cursor-pointer relative md:col-span-2 min-h-[520px] bg-white flex flex-col p-10 lg:p-14 overflow-hidden"
         >
-          {/* Background image — right half */}
+          {/* Background image — full cover */}
           <img
             src="/category-clothing.png"
             alt=""
-            className="absolute inset-y-0 right-0 h-full w-[58%] object-cover object-center opacity-90 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-60 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
             draggable={false}
           />
-          {/* Gradient: white (left) → transparent (right) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none" />
+          {/* Overlay: stronger at bottom/left for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/30 to-white/10 pointer-events-none" />
 
           {/* Top animated line */}
           <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
@@ -197,15 +197,15 @@ export default function Home() {
           onClick={() => setLocation('/products?category=accessories')}
           className="group cursor-pointer relative min-h-[520px] bg-[#F4F4F4] flex flex-col p-10 lg:p-12 overflow-hidden"
         >
-          {/* Background image — right portion */}
+          {/* Background image — full cover */}
           <img
             src="/category-accessories.png"
             alt=""
-            className="absolute inset-y-0 right-0 h-full w-[65%] object-cover object-center opacity-85 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-60 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
             draggable={false}
           />
-          {/* Gradient: #F4F4F4 (left) → transparent */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#F4F4F4] via-[#F4F4F4]/85 to-transparent pointer-events-none" />
+          {/* Overlay: stronger at bottom for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#F4F4F4]/95 via-[#F4F4F4]/30 to-[#F4F4F4]/10 pointer-events-none" />
 
           <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
 
