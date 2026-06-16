@@ -89,7 +89,7 @@ export default function Home() {
       <div className="bg-black text-white py-3.5 overflow-hidden flex whitespace-nowrap">
         <div className="animate-marquee inline-block">
           {[1, 2, 3].map(i => (
-            <span key={i} className="text-[11px] font-light tracking-[0.2em] uppercase mx-4">Free shipping on orders over PKR 50,000 · Complimentary gift wrapping · SS26 Collection — Now Available · 30-day returns · Exclusive member benefits ·</span>
+            <span key={i} className="text-[11px] font-light tracking-[0.2em] uppercase mx-4">Free shipping on orders over PKR 15,000 · Complimentary gift wrapping · SS26 Collection — Now Available · 7-day returns · Exclusive member benefits ·</span>
           ))}
         </div>
       </div>
@@ -321,7 +321,7 @@ export default function Home() {
       <section className="py-32 px-8 max-w-[1400px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {[
-            { icon: Truck, title: 'Free Shipping', desc: 'Complimentary worldwide delivery on all orders over PKR 50,000' },
+            { icon: Truck, title: 'Free Shipping', desc: 'Complimentary delivery on all orders over PKR 15,000' },
             { icon: ShieldCheck, title: 'Authenticity Guaranteed', desc: 'Every piece is verified and certified before delivery' },
             { icon: RefreshCw, title: '30-Day Returns', desc: 'Hassle-free returns within 30 days, no questions asked' },
             { icon: Gift, title: 'Luxury Packaging', desc: 'Beautifully packaged in our signature gift boxes' },

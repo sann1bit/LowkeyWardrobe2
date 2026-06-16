@@ -4,7 +4,7 @@ import { FigureSVG } from './FigureSVG';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { Link } from 'wouter';
 
-const FREE_SHIPPING_THRESHOLD = 50000;
+const FREE_SHIPPING_THRESHOLD = 15000;
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, updateQty, removeItem, total, shipping } = useCartStore();

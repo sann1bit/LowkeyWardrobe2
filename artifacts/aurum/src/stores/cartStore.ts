@@ -100,7 +100,7 @@ export const useCartStore = create<CartStore>()(
       },
       shipping: () => {
         const { total } = get();
-        return total() >= 50000 ? 0 : 1500;
+        return total() >= 15000 ? 0 : 200;
       },
     }),
     {

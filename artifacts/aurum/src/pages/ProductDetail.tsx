@@ -443,7 +443,7 @@ export default function ProductDetail() {
             <div className="space-y-4 border-t border-[#EAEAEA] pt-8 text-[12px] font-light text-[#666666]">
               <div className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
-                <p>Free complimentary shipping on orders over PKR 50,000</p>
+                <p>Free shipping on orders over PKR 15,000</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div>

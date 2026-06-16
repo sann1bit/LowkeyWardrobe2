@@ -437,9 +437,9 @@ export default function Checkout() {
               <span>PKR {grandTotal.toLocaleString()}</span>
             </div>
           </div>
-          {subtotal < 50000 && (
+          {subtotal < 15000 && (
             <p className="text-[11px] text-[#999999] mt-4 leading-[1.6]">
-              Add PKR {(50000 - subtotal).toLocaleString()} more for complimentary shipping.
+              Add PKR {(15000 - subtotal).toLocaleString()} more for complimentary shipping.
             </p>
           )}
         </div>

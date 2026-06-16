@@ -109,7 +109,7 @@ export default function Cart() {
                   </div>
                   {shipping() > 0 && (
                     <div className="text-[12px] text-[#999999] mt-[-8px]">
-                      Spend PKR {(50000 - total()).toLocaleString()} more for complimentary shipping
+                      Spend PKR {(15000 - total()).toLocaleString()} more for complimentary shipping
                     </div>
                   )}
                 </div>
