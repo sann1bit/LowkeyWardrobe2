@@ -229,23 +229,23 @@ export default function ProductDetail() {
         <span className="text-black">{product.name}</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 max-w-[1600px] mx-auto min-h-[calc(100vh-140px)]">
+      <div className="grid grid-cols-1 md:grid-cols-2 max-w-[1600px] mx-auto min-h-[calc(100vh-64px)]">
 
         {/* Left: Visuals */}
-        <div className="flex bg-[#F5F5F5] relative overflow-hidden min-h-[500px]">
+        <div className="relative bg-[#F0F0F0] overflow-hidden md:sticky md:top-[64px] md:h-[calc(100vh-64px)]">
           {!activeImage && (
             <div className="absolute inset-0" style={{ background: product.bgGradient, opacity: 0.6 }} />
           )}
 
-          {/* Thumbnail strip */}
+          {/* Thumbnail strip — floating left overlay */}
           {allImages.length > 1 && (
-            <div className="flex flex-col gap-2 p-4 z-10 shrink-0 overflow-y-auto max-h-[calc(100vh-64px)] scrollbar-hide">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide py-2">
               {allImages.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImageIndex(i)}
-                  className={`w-[72px] h-[88px] overflow-hidden shrink-0 border-2 transition-all duration-200 ${
-                    i === activeImageIndex ? 'border-black' : 'border-transparent opacity-60 hover:opacity-100'
+                  className={`w-[68px] h-[84px] overflow-hidden shrink-0 border-2 transition-all duration-200 ${
+                    i === activeImageIndex ? 'border-black' : 'border-transparent opacity-50 hover:opacity-90'
                   }`}
                 >
                   <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
@@ -254,75 +254,72 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {/* Main image + hover zoom */}
-          <div className="flex-1 flex items-center justify-center p-8 md:p-10 lg:p-16 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-              className="w-full max-w-[480px] relative"
+          {/* Main image — fills full column */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full h-full min-h-[70vw] md:min-h-0"
+          >
+            <div
+              ref={imgContainerRef}
+              className={`w-full h-full relative group/img ${activeImage ? 'cursor-crosshair' : 'cursor-default'}`}
+              onMouseEnter={() => { if (activeImage) setIsZoomActive(true); }}
+              onMouseLeave={() => setIsZoomActive(false)}
+              onMouseMove={handleMouseMove}
+              onClick={() => { if (activeImage) setLightboxOpen(true); }}
             >
-              {/* Image container with hover zoom */}
-              <div
-                ref={imgContainerRef}
-                className={`w-full aspect-[3/4] relative overflow-hidden group/img ${activeImage ? 'cursor-crosshair' : 'cursor-default'}`}
-                onMouseEnter={() => { if (activeImage) setIsZoomActive(true); }}
-                onMouseLeave={() => setIsZoomActive(false)}
-                onMouseMove={handleMouseMove}
-                onClick={() => { if (activeImage) setLightboxOpen(true); }}
-              >
-                {activeImage ? (
-                  <motion.img
-                    key={activeImage}
-                    src={activeImage}
-                    alt={product.name}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.25 }}
-                    className="w-full h-full object-cover select-none"
-                    draggable={false}
-                  />
-                ) : (
-                  <FigureSVG
-                    figType={product.figType}
-                    ca={product.figColorA}
-                    cb={product.figColorB}
-                    className="w-full h-full"
-                  />
-                )}
+              {activeImage ? (
+                <motion.img
+                  key={activeImage}
+                  src={activeImage}
+                  alt={product.name}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.25 }}
+                  className="w-full h-full object-cover object-center select-none"
+                  draggable={false}
+                />
+              ) : (
+                <FigureSVG
+                  figType={product.figType}
+                  ca={product.figColorA}
+                  cb={product.figColorB}
+                  className="w-full h-full"
+                />
+              )}
 
-                {/* Zoom lens overlay — follows cursor */}
-                {activeImage && (
-                  <div
-                    className={`absolute inset-0 transition-opacity duration-150 pointer-events-none ${isZoomActive ? 'opacity-100' : 'opacity-0'}`}
-                    style={{
-                      backgroundImage: `url(${activeImage})`,
-                      backgroundSize: `${ZOOM_LEVEL * 100}%`,
-                      backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-                      backgroundRepeat: 'no-repeat',
-                    }}
-                  />
-                )}
+              {/* Zoom lens overlay */}
+              {activeImage && (
+                <div
+                  className={`absolute inset-0 transition-opacity duration-150 pointer-events-none ${isZoomActive ? 'opacity-100' : 'opacity-0'}`}
+                  style={{
+                    backgroundImage: `url(${activeImage})`,
+                    backgroundSize: `${ZOOM_LEVEL * 100}%`,
+                    backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+                    backgroundRepeat: 'no-repeat',
+                  }}
+                />
+              )}
 
-                {/* Hint label */}
-                {activeImage && (
-                  <div className={`absolute bottom-3 right-3 px-2 py-1 bg-black/60 text-white text-[9px] uppercase tracking-[0.15em] pointer-events-none transition-opacity duration-200 ${isZoomActive ? 'opacity-0' : 'opacity-100 group-hover/img:opacity-0'}`}>
-                    Hover to zoom
-                  </div>
-                )}
-              </div>
+              {/* Hint label */}
+              {activeImage && (
+                <div className={`absolute bottom-4 right-4 px-2 py-1 bg-black/50 text-white text-[9px] uppercase tracking-[0.15em] pointer-events-none transition-opacity duration-200 ${isZoomActive ? 'opacity-0' : 'opacity-100 group-hover/img:opacity-0'}`}>
+                  Hover to zoom
+                </div>
+              )}
 
-              {/* Click-to-enlarge hint */}
+              {/* Click-to-enlarge */}
               {activeImage && !isZoomActive && (
-                <p className="text-center text-[9px] uppercase tracking-[0.2em] text-[#BBBBBB] mt-3 select-none">
+                <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-[0.2em] text-white/50 pointer-events-none select-none">
                   Click to enlarge
                 </p>
               )}
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
 
           {/* Badges */}
-          <div className={`absolute top-8 z-20 flex flex-col gap-2 ${allImages.length > 1 ? 'left-[96px]' : 'left-8'}`}>
+          <div className={`absolute top-8 z-20 flex flex-col gap-2 ${allImages.length > 1 ? 'left-[88px]' : 'left-6'}`}>
             {isSoldOut && (
               <span className="px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-white bg-black">Sold Out</span>
             )}
