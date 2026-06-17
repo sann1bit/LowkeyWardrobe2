@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
 import { useGetProduct } from '@workspace/api-client-react';
 import { products as hardcodedProducts, Product } from '../data/products';
@@ -7,11 +7,9 @@ import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCartStore } from '../stores/cartStore';
 import { useWishlistStore } from '../stores/wishlistStore';
 import { useUIStore } from '../stores/uiStore';
-import { Heart, ChevronRight, X, ChevronLeft, ChevronRight as ChevronRightIcon } from 'lucide-react';
+import { Heart, ChevronRight, X, ChevronLeft, ChevronRight as ChevronRightIcon, Expand } from 'lucide-react';
 import { Link } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const ZOOM_LEVEL = 2.8;
 
 export default function ProductDetail() {
   const [, params] = useRoute('/products/:slug');
@@ -25,11 +23,6 @@ export default function ProductDetail() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  // Hover zoom state
-  const [isZoomActive, setIsZoomActive] = useState(false);
-  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 }); // 0–1 normalized
-  const imgContainerRef = useRef<HTMLDivElement>(null);
 
   const { addItem } = useCartStore();
   const { toggle, isInWishlist } = useWishlistStore();
@@ -65,20 +58,19 @@ export default function ProductDetail() {
     return () => window.removeEventListener('keydown', handler);
   }, [lightboxOpen, allImages.length]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imgContainerRef.current || !activeImage) return;
-    const rect = imgContainerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-    setZoomPos({ x, y });
-  }, [activeImage]);
-
   if (isLoading && !product) {
     return (
       <div className="w-full min-h-[100dvh] pt-[120px] pb-24 bg-white">
         <div className="max-w-[1200px] mx-auto px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            <div className="skeleton aspect-[3/4] w-full" />
+            <div className="flex gap-4">
+              <div className="hidden lg:flex flex-col gap-3 w-[72px] shrink-0 pt-8">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="skeleton w-[56px] h-[72px] rounded-[1px]" />
+                ))}
+              </div>
+              <div className="skeleton flex-1 min-h-[70vh] rounded-[1px]" />
+            </div>
             <div className="pt-4 flex flex-col gap-5">
               <div className="skeleton h-[10px] w-[35%] rounded-[2px]" />
               <div className="skeleton h-[38px] w-[80%] rounded-[2px]" />
@@ -134,9 +126,26 @@ export default function ProductDetail() {
     ? Math.round((1 - Number(product.price) / Number(product.originalPrice)) * 100)
     : null;
 
-  // Zoom background position: maps 0–1 to the right CSS background-position percentages
-  const bgPosX = zoomPos.x * 100;
-  const bgPosY = zoomPos.y * 100;
+  const thumbnailButton = (img: string, i: number, size: 'mobile' | 'desktop') => {
+    const isActive = i === activeImageIndex;
+    const sizeClasses =
+      size === 'desktop'
+        ? 'w-[56px] h-[72px]'
+        : 'w-[52px] h-[68px]';
+
+    return (
+      <button
+        key={`${img}-${i}`}
+        type="button"
+        onClick={() => setActiveImageIndex(i)}
+        aria-label={`View image ${i + 1}`}
+        aria-current={isActive}
+        className={`${sizeClasses} shrink-0 overflow-hidden bg-white border transition-all duration-200 ${isActive ? 'border-black' : 'border-[#E0E0E0] hover:border-[#999999]'}`}
+      >
+        <img src={img} alt="" className="w-full h-full object-cover" />
+      </button>
+    );
+  };
 
   return (
     <div className="w-full min-h-[100dvh] pt-[64px] bg-white text-black">
@@ -231,108 +240,99 @@ export default function ProductDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 max-w-[1600px] mx-auto min-h-[calc(100vh-64px)]">
 
-        {/* Left: Visuals */}
-        <div className="relative bg-[#F0F0F0] overflow-hidden md:sticky md:top-[64px] md:h-[calc(100vh-64px)]">
-          {!activeImage && (
-            <div className="absolute inset-0" style={{ background: product.bgGradient, opacity: 0.6 }} />
-          )}
+        {/* Left: Image gallery — SSENSE / Zara style */}
+        <div className="flex flex-col bg-white md:sticky md:top-[64px] md:h-[calc(100vh-64px)] md:border-r border-[#EAEAEA]">
 
-          {/* Thumbnail strip — floating left overlay */}
+          {/* Mobile thumbnail strip */}
           {allImages.length > 1 && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide py-2">
-              {allImages.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveImageIndex(i)}
-                  className={`w-[68px] h-[84px] overflow-hidden shrink-0 border-2 transition-all duration-200 ${
-                    i === activeImageIndex ? 'border-black' : 'border-transparent opacity-50 hover:opacity-90'
-                  }`}
-                >
-                  <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
+            <div className="md:hidden flex gap-2.5 px-4 pt-4 pb-3 overflow-x-auto scrollbar-hide border-b border-[#EAEAEA]">
+              {allImages.map((img, i) => thumbnailButton(img, i, 'mobile'))}
             </div>
           )}
 
-          {/* Main image — fills full column */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="w-full h-full min-h-[70vw] md:min-h-0"
-          >
-            <div
-              ref={imgContainerRef}
-              className={`w-full h-full relative group/img ${activeImage ? 'cursor-crosshair' : 'cursor-default'}`}
-              onMouseEnter={() => { if (activeImage) setIsZoomActive(true); }}
-              onMouseLeave={() => setIsZoomActive(false)}
-              onMouseMove={handleMouseMove}
-              onClick={() => { if (activeImage) setLightboxOpen(true); }}
-            >
-              {activeImage ? (
-                <motion.img
-                  key={activeImage}
-                  src={activeImage}
-                  alt={product.name}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.25 }}
-                  className="w-full h-full object-cover object-center select-none"
-                  draggable={false}
-                />
-              ) : (
-                <FigureSVG
-                  figType={product.figType}
-                  ca={product.figColorA}
-                  cb={product.figColorB}
-                  className="w-full h-full"
-                />
-              )}
+          <div className="flex flex-1 min-h-[65vh] md:min-h-0">
+            {/* Desktop thumbnail rail */}
+            {allImages.length > 1 && (
+              <nav
+                className="hidden md:flex flex-col items-center gap-3 shrink-0 w-[88px] py-10 px-4 border-r border-[#EAEAEA] overflow-y-auto scrollbar-hide"
+                aria-label="Product images"
+              >
+                {allImages.map((img, i) => thumbnailButton(img, i, 'desktop'))}
+              </nav>
+            )}
 
-              {/* Zoom lens overlay */}
-              {activeImage && (
+            {/* Main image viewer */}
+            <div className="relative flex-1 min-h-0 bg-[#FAFAFA] md:bg-white">
+              {!activeImage && (
                 <div
-                  className={`absolute inset-0 transition-opacity duration-150 pointer-events-none ${isZoomActive ? 'opacity-100' : 'opacity-0'}`}
-                  style={{
-                    backgroundImage: `url(${activeImage})`,
-                    backgroundSize: `${ZOOM_LEVEL * 100}%`,
-                    backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-                    backgroundRepeat: 'no-repeat',
-                  }}
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: product.bgGradient, opacity: 0.35 }}
                 />
               )}
 
-              {/* Hint label */}
-              {activeImage && (
-                <div className={`absolute bottom-4 right-4 px-2 py-1 bg-black/50 text-white text-[9px] uppercase tracking-[0.15em] pointer-events-none transition-opacity duration-200 ${isZoomActive ? 'opacity-0' : 'opacity-100 group-hover/img:opacity-0'}`}>
-                  Hover to zoom
-                </div>
-              )}
+              {/* Badges */}
+              <div className="absolute top-5 left-5 z-10 flex flex-col gap-1.5">
+                {isSoldOut && (
+                  <span className="px-2.5 py-1 text-[9px] uppercase tracking-[0.15em] text-white bg-black">
+                    Sold Out
+                  </span>
+                )}
+                {!isSoldOut && product.badge && (
+                  <span className="px-2.5 py-1 text-[9px] uppercase tracking-[0.15em] text-white bg-black">
+                    {product.badge === 'new' ? 'New Arrival' : 'Sale'}
+                  </span>
+                )}
+                {discountPct && (
+                  <span className="px-2.5 py-1 text-[9px] uppercase tracking-[0.15em] text-white bg-black">
+                    -{discountPct}%
+                  </span>
+                )}
+              </div>
 
-              {/* Click-to-enlarge */}
-              {activeImage && !isZoomActive && (
-                <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-[0.2em] text-white/50 pointer-events-none select-none">
-                  Click to enlarge
+              <motion.button
+                type="button"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                onClick={() => activeImage && setLightboxOpen(true)}
+                disabled={!activeImage}
+                className={`group absolute inset-0 flex items-center justify-center p-6 md:p-10 lg:p-12 w-full h-full ${activeImage ? 'cursor-zoom-in' : 'cursor-default'}`}
+                aria-label="View fullscreen image"
+              >
+                {activeImage ? (
+                  <motion.img
+                    key={activeImage}
+                    src={activeImage}
+                    alt={product.name}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="max-h-full max-w-full w-auto h-auto object-contain select-none"
+                    draggable={false}
+                  />
+                ) : (
+                  <FigureSVG
+                    figType={product.figType}
+                    ca={product.figColorA}
+                    cb={product.figColorB}
+                    className="w-full h-full max-h-[min(80vh,900px)]"
+                  />
+                )}
+
+                {activeImage && (
+                  <span className="absolute bottom-5 right-5 flex items-center gap-1.5 px-2.5 py-1.5 bg-white/90 border border-[#EAEAEA] text-[9px] uppercase tracking-[0.15em] text-[#666666] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                    <Expand size={12} strokeWidth={1.5} />
+                    Fullscreen
+                  </span>
+                )}
+              </motion.button>
+
+              {activeImage && allImages.length > 1 && (
+                <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-[#AAAAAA] pointer-events-none select-none md:hidden">
+                  {activeImageIndex + 1} / {allImages.length}
                 </p>
               )}
             </div>
-          </motion.div>
-
-          {/* Badges */}
-          <div className={`absolute top-8 z-20 flex flex-col gap-2 ${allImages.length > 1 ? 'left-[88px]' : 'left-6'}`}>
-            {isSoldOut && (
-              <span className="px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-white bg-black">Sold Out</span>
-            )}
-            {!isSoldOut && product.badge && (
-              <span className="px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-white bg-black">
-                {product.badge === 'new' ? 'New Arrival' : 'Sale'}
-              </span>
-            )}
-            {discountPct && (
-              <span className="px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-white bg-black">
-                -{discountPct}%
-              </span>
-            )}
           </div>
         </div>
 
