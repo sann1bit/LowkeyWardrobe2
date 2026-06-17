@@ -1,11 +1,14 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import multer from "multer";
-import { getUploadSignedUrl, supabase, ensureBucket } from "../lib/supabaseStorage";
+import { randomUUID } from "crypto";
+import {
+  getUploadSignedUrl,
+  uploadObject,
+  getObjectPublicUrl,
+} from "../lib/supabaseStorage";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
-
-const BUCKET_NAME = "product-images";
 
 /**
  * POST /storage/uploads/file
@@ -21,30 +24,19 @@ router.post(
       return;
     }
 
-    const { originalname, mimetype, buffer } = req.file;
+    const { mimetype, buffer } = req.file;
     const ext = mimetype.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
-
-    const { randomUUID } = await import("crypto");
     const objectName = `uploads/${randomUUID()}.${ext}`;
 
-    await ensureBucket();
-
-    const { error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(objectName, buffer, { contentType: mimetype, upsert: false });
-
-    if (error) {
+    try {
+      await uploadObject(objectName, buffer, mimetype);
+      res.json({ publicUrl: getObjectPublicUrl(objectName), objectName });
+    } catch (error) {
       req.log.error({ err: error }, "Supabase upload failed");
-      res.status(500).json({ error: `Upload failed: ${error.message}` });
-      return;
+      const message = error instanceof Error ? error.message : "Upload failed";
+      res.status(500).json({ error: `Upload failed: ${message}` });
     }
-
-    const { data: urlData } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(objectName);
-
-    res.json({ publicUrl: urlData.publicUrl, objectName });
-  }
+  },
 );
 
 /**

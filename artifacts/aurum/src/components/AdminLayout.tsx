@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { apiUrl } from '../lib/api';
 import { LayoutDashboard, Package, Mail, ShoppingBag, LogOut, ChevronRight, Menu, X } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -102,8 +103,7 @@ export function getAdminToken(): string | null {
 
 export async function adminFetch(path: string, options: RequestInit = {}) {
   const token = getAdminToken();
-  const BASE = (import.meta as any).env.BASE_URL.replace(/\/$/, '');
-  return fetch(`${BASE}${path}`, {
+  return fetch(apiUrl(path), {
     ...options,
     headers: {
       'Content-Type': 'application/json',

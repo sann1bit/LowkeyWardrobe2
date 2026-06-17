@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { Eye, EyeOff } from 'lucide-react';
+import { apiUrl } from '../lib/api';
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
@@ -16,8 +17,7 @@ export default function AdminLogin() {
     setLoading(true);
     setError('');
     try {
-      const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
-      const res = await fetch(`${BASE}/api/admin/login`, {
+      const res = await fetch(apiUrl('/api/admin/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

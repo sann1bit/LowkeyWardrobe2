@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AdminLayout, adminFetch } from '../components/AdminLayout';
+import { AdminLayout, adminFetch, getAdminToken } from '../components/AdminLayout';
+import { apiUrl } from '../lib/api';
 import { Search, Plus, Edit2, Trash2, Eye, EyeOff, X, Check, Package, Star, ImagePlus, Upload, Link2 } from 'lucide-react';
 
 interface AdminProduct {
@@ -57,13 +58,13 @@ const DEFAULT_FORM = {
 type FormState = typeof DEFAULT_FORM;
 
 async function uploadImageToSupabase(file: File, onProgress?: (pct: number) => void): Promise<string> {
-  const token = localStorage.getItem('admin_token');
+  const token = getAdminToken();
   return new Promise<string>((resolve, reject) => {
     const formData = new FormData();
     formData.append('file', file);
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/storage/uploads/file');
+    xhr.open('POST', apiUrl('/api/storage/uploads/file'));
     if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
     xhr.upload.onprogress = (e) => {
