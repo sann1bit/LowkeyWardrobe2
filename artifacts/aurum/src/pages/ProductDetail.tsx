@@ -130,8 +130,8 @@ export default function ProductDetail() {
     const isActive = i === activeImageIndex;
     const sizeClasses =
       size === 'desktop'
-        ? 'w-[56px] h-[72px]'
-        : 'w-[52px] h-[68px]';
+        ? 'w-[64px] h-[80px]'
+        : 'w-[54px] h-[68px]';
 
     return (
       <button
@@ -140,7 +140,7 @@ export default function ProductDetail() {
         onClick={() => setActiveImageIndex(i)}
         aria-label={`View image ${i + 1}`}
         aria-current={isActive}
-        className={`${sizeClasses} shrink-0 overflow-hidden bg-white border transition-all duration-200 ${isActive ? 'border-black' : 'border-[#E0E0E0] hover:border-[#999999]'}`}
+        className={`${sizeClasses} shrink-0 overflow-hidden bg-[#F5F5F5] border transition-all duration-200 ${isActive ? 'border-black' : 'border-transparent hover:border-[#C8C8C8]'}`}
       >
         <img src={img} alt="" className="w-full h-full object-cover" />
       </button>
@@ -245,16 +245,16 @@ export default function ProductDetail() {
 
           {/* Mobile thumbnail strip */}
           {allImages.length > 1 && (
-            <div className="md:hidden flex gap-2.5 px-4 pt-4 pb-3 overflow-x-auto scrollbar-hide border-b border-[#EAEAEA]">
+            <div className="md:hidden flex gap-2 px-4 pt-4 pb-3 overflow-x-auto scrollbar-hide border-b border-[#EAEAEA]">
               {allImages.map((img, i) => thumbnailButton(img, i, 'mobile'))}
             </div>
           )}
 
-          <div className="flex flex-1 min-h-[65vh] md:min-h-0">
+          <div className="flex flex-1 overflow-hidden min-h-[65vh] md:min-h-0">
             {/* Desktop thumbnail rail */}
             {allImages.length > 1 && (
               <nav
-                className="hidden md:flex flex-col items-center gap-3 shrink-0 w-[88px] py-10 px-4 border-r border-[#EAEAEA] overflow-y-auto scrollbar-hide"
+                className="hidden md:flex flex-col items-center gap-2.5 shrink-0 w-[84px] pt-6 pb-6 px-[10px] border-r border-[#EAEAEA] overflow-y-auto scrollbar-hide"
                 aria-label="Product images"
               >
                 {allImages.map((img, i) => thumbnailButton(img, i, 'desktop'))}
@@ -262,11 +262,11 @@ export default function ProductDetail() {
             )}
 
             {/* Main image viewer */}
-            <div className="relative flex-1 min-h-0 bg-[#FAFAFA] md:bg-white">
+            <div className="relative flex-1 min-h-0 bg-[#F5F5F5]">
               {!activeImage && (
                 <div
                   className="absolute inset-0 pointer-events-none"
-                  style={{ background: product.bgGradient, opacity: 0.35 }}
+                  style={{ background: product.bgGradient, opacity: 0.25 }}
                 />
               )}
 
@@ -296,7 +296,7 @@ export default function ProductDetail() {
                 transition={{ duration: 0.4 }}
                 onClick={() => activeImage && setLightboxOpen(true)}
                 disabled={!activeImage}
-                className={`group absolute inset-0 flex items-center justify-center p-6 md:p-10 lg:p-12 w-full h-full ${activeImage ? 'cursor-zoom-in' : 'cursor-default'}`}
+                className={`group absolute inset-0 flex items-center justify-center p-4 md:p-6 ${activeImage ? 'cursor-zoom-in' : 'cursor-default'}`}
                 aria-label="View fullscreen image"
               >
                 {activeImage ? (
@@ -320,8 +320,8 @@ export default function ProductDetail() {
                 )}
 
                 {activeImage && (
-                  <span className="absolute bottom-5 right-5 flex items-center gap-1.5 px-2.5 py-1.5 bg-white/90 border border-[#EAEAEA] text-[9px] uppercase tracking-[0.15em] text-[#666666] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                    <Expand size={12} strokeWidth={1.5} />
+                  <span className="absolute bottom-5 right-5 flex items-center gap-1.5 px-2.5 py-1.5 bg-white/95 border border-[#DCDCDC] text-[9px] uppercase tracking-[0.15em] text-[#555555] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                    <Expand size={11} strokeWidth={1.5} />
                     Fullscreen
                   </span>
                 )}
