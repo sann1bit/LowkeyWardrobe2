@@ -32,9 +32,16 @@ router.post(
       await uploadObject(objectName, buffer, mimetype);
       res.json({ publicUrl: getObjectPublicUrl(objectName), objectName });
     } catch (error) {
-      req.log.error({ err: error }, "Supabase upload failed");
+      const cause = error instanceof Error ? (error.cause as Error | undefined) : undefined;
+      req.log.error({
+        err: error,
+        errMessage: error instanceof Error ? error.message : String(error),
+        errCause: cause?.message ?? String(cause),
+        supabaseUrl: process.env.SUPABASE_URL,
+        hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      }, "Supabase upload failed");
       const message = error instanceof Error ? error.message : "Upload failed";
-      res.status(500).json({ error: `Upload failed: ${message}` });
+      res.status(500).json({ error: `Upload failed: ${message}`, cause: cause?.message });
     }
   },
 );
