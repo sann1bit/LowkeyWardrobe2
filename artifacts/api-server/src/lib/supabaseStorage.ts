@@ -57,7 +57,7 @@ export async function uploadObject(
       "Content-Type": contentType,
       "x-upsert": "false",
     },
-    body: buffer,
+    body: new Blob([buffer], { type: contentType }),
   });
 
   if (!res.ok) {
