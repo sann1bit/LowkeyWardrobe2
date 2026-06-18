@@ -1,8 +1,36 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/:path*"
+      "source": "/api/products/:path*",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/products/:path*"
+    },
+    {
+      "source": "/api/products",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/products"
+    },
+    {
+      "source": "/api/admin/:path*",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/admin/:path*"
+    },
+    {
+      "source": "/api/admin",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/admin"
+    },
+    {
+      "source": "/api/newsletter/:path*",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/newsletter/:path*"
+    },
+    {
+      "source": "/api/newsletter",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/newsletter"
+    },
+    {
+      "source": "/api/orders/:path*",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/orders/:path*"
+    },
+    {
+      "source": "/api/orders",
+      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/orders"
     },
     {
       "source": "/((?!api).*)",

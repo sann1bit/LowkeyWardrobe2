@@ -1,2 +1,4 @@
 - [PKR price filter default](pkr-price-filter.md) — Products.tsx priceRange default must match price scale; PKR prices need [0,100000] not [0,2000]
 - [DB numeric prices as strings](db-numeric-strings.md) — PostgreSQL numeric type returns strings via Drizzle; always wrap with Number() before comparison
+- [Upload approach: JSON/base64](upload-json-base64.md) — Storage upload uses JSON base64 (not multipart); Railway can't reach Supabase Storage; Vercel function handles uploads
+- [Admin auth guard pattern](admin-auth-guard.md) — AdminLayout must track authChecked state; render spinner until useEffect verifies token; prevents blank-page on redirect

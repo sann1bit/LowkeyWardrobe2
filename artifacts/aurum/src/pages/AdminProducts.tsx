@@ -57,34 +57,39 @@ const DEFAULT_FORM = {
 
 type FormState = typeof DEFAULT_FORM;
 
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(',')[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 async function uploadImageToSupabase(file: File, onProgress?: (pct: number) => void): Promise<string> {
   const token = getAdminToken();
-  return new Promise<string>((resolve, reject) => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', apiUrl('/api/storage/uploads/file'));
-    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
-    };
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const { publicUrl } = JSON.parse(xhr.responseText);
-          resolve(publicUrl);
-        } catch {
-          reject(new Error('Invalid response from server'));
-        }
-      } else {
-        reject(new Error(`Upload failed (${xhr.status}): ${xhr.responseText}`));
-      }
-    };
-    xhr.onerror = () => reject(new Error('Network error during upload'));
-    xhr.send(formData);
+  onProgress?.(10);
+  const base64 = await fileToBase64(file);
+  onProgress?.(40);
+  const res = await fetch(apiUrl('/api/storage/uploads/file'), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ data: base64, type: file.type }),
   });
+  onProgress?.(90);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Upload failed (${res.status}): ${text}`);
+  }
+  const { publicUrl } = await res.json() as { publicUrl: string };
+  onProgress?.(100);
+  return publicUrl;
 }
 
 export default function AdminProducts() {

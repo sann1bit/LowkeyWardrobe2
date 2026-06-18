@@ -1,3 +1,4 @@
+import { Component, type ReactNode } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -33,6 +34,30 @@ function isAdminRoute() {
   return ADMIN_ROUTES.some(r => rel === r || rel.startsWith(r + '/'));
 }
 
+class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAFAFA] px-8">
+          <p className="font-serif text-[28px] italic mb-4">Something went wrong</p>
+          <p className="text-[13px] text-[#999] mb-6 text-center max-w-md">
+            {(this.state.error as Error).message}
+          </p>
+          <button
+            onClick={() => { this.setState({ error: null }); window.location.reload(); }}
+            className="px-6 py-3 bg-black text-white text-[12px] uppercase tracking-[0.15em] hover:bg-[#333]"
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function Router() {
   return (
     <Switch>
@@ -60,27 +85,31 @@ function App() {
   const adminRoute = isAdminRoute();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-        <PageLoader />
-        <RouteProgress />
-        {adminRoute ? (
-          <Router />
-        ) : (
-          <div className="flex flex-col min-h-screen bg-white">
-            <Navbar />
-            <main className="flex-1">
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <PageLoader />
+          <RouteProgress />
+          {adminRoute ? (
+            <ErrorBoundary>
               <Router />
-            </main>
-            <Footer />
-            <CartDrawer />
-            <SearchOverlay />
-            <Toast />
-            <ChatWidget />
-          </div>
-        )}
-      </WouterRouter>
-    </QueryClientProvider>
+            </ErrorBoundary>
+          ) : (
+            <div className="flex flex-col min-h-screen bg-white">
+              <Navbar />
+              <main className="flex-1">
+                <Router />
+              </main>
+              <Footer />
+              <CartDrawer />
+              <SearchOverlay />
+              <Toast />
+              <ChatWidget />
+            </div>
+          )}
+        </WouterRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -11,11 +11,24 @@ interface AdminLayoutProps {
 export function AdminLayout({ children, title }: AdminLayoutProps) {
   const [location, setLocation] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('aurum_admin_token');
-    if (!token) setLocation('/admin/login');
+    if (!token) {
+      setLocation('/admin/login');
+    } else {
+      setAuthChecked(true);
+    }
   }, [setLocation]);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <span className="spinner spinner--lg" style={{ color: '#111' }} />
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('aurum_admin_token');
@@ -66,12 +79,10 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex">
-      {/* Desktop Sidebar */}
       <div className="hidden lg:flex w-[220px] bg-white border-r border-[#EAEAEA] flex-col fixed top-0 left-0 h-full z-10">
         <Sidebar />
       </div>
 
-      {/* Mobile Sidebar */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="w-[220px] bg-white border-r border-[#EAEAEA] flex flex-col">
@@ -81,7 +92,6 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
         </div>
       )}
 
-      {/* Main */}
       <div className="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
         <header className="bg-white border-b border-[#EAEAEA] px-8 py-4 flex items-center gap-4">
           <button className="lg:hidden" onClick={() => setMobileOpen(true)}>

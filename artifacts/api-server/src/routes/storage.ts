@@ -1,35 +1,38 @@
 import { Router, type IRouter, type Request, type Response } from "express";
-import multer from "multer";
 import { randomUUID } from "crypto";
 import {
-  getUploadSignedUrl,
   uploadObject,
   getObjectPublicUrl,
 } from "../lib/supabaseStorage";
 
 const router: IRouter = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
 /**
  * POST /storage/uploads/file
- * Accepts multipart/form-data with a single "file" field.
+ * Accepts JSON { data: "<base64>", type: "image/jpeg" }
  * Uploads directly to Supabase via service role (no CORS issues).
  */
 router.post(
   "/storage/uploads/file",
-  upload.single("file"),
   async (req: Request, res: Response) => {
-    if (!req.file) {
-      res.status(400).json({ error: "No file provided" });
+    const { data: base64, type: contentType } = (req.body ?? {}) as { data?: string; type?: string };
+
+    if (typeof base64 !== "string" || typeof contentType !== "string" || !base64 || !contentType) {
+      res.status(400).json({ error: "Missing required fields: data (base64 string), type (MIME type)" });
       return;
     }
 
-    const { mimetype, buffer } = req.file;
-    const ext = mimetype.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+    const buffer = Buffer.from(base64, "base64");
+    if (buffer.length === 0) {
+      res.status(400).json({ error: "Empty file data" });
+      return;
+    }
+
+    const ext = contentType.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
     const objectName = `uploads/${randomUUID()}.${ext}`;
 
     try {
-      await uploadObject(objectName, buffer, mimetype);
+      await uploadObject(objectName, buffer, contentType);
       res.json({ publicUrl: getObjectPublicUrl(objectName), objectName });
     } catch (error) {
       const cause = error instanceof Error ? (error.cause as Error | undefined) : undefined;
@@ -45,24 +48,5 @@ router.post(
     }
   },
 );
-
-/**
- * POST /storage/uploads/request-url  (kept for backward compat)
- */
-router.post("/storage/uploads/request-url", async (req: Request, res: Response) => {
-  const { name, size, contentType } = req.body ?? {};
-  if (typeof name !== "string" || typeof size !== "number" || typeof contentType !== "string") {
-    res.status(400).json({ error: "Missing or invalid required fields: name, size, contentType" });
-    return;
-  }
-
-  try {
-    const { uploadURL, objectPath, publicUrl } = await getUploadSignedUrl(contentType);
-    res.json({ uploadURL, objectPath, publicUrl, metadata: { name, size, contentType } });
-  } catch (error) {
-    req.log.error({ err: error }, "Error generating upload URL");
-    res.status(500).json({ error: "Failed to generate upload URL" });
-  }
-});
 
 export default router;
