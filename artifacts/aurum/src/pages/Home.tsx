@@ -14,6 +14,11 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [, setLocation] = useLocation();
+  const [siteSettings, setSiteSettings] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(setSiteSettings).catch(() => {});
+  }, []);
 
   const displayProducts = apiProducts && apiProducts.length > 0 ? apiProducts : hardcodedProducts;
   const newArrivals = displayProducts.filter(p => p.badge === 'new').slice(0, 4);
@@ -38,15 +43,16 @@ export default function Home() {
     { id: 'accessories', label: 'Accessories' }
   ];
 
+  const s = siteSettings;
   const slides = [
-    { image: '/hero-1.png', eyebrow: 'SS26 Collection', line1: 'Discover Your', line2: 'Signature Style', primaryHref: '/products', secondaryHref: '/products?category=new' },
-    { image: '/hero-2.png', eyebrow: 'New Arrivals', line1: 'Crafted for the', line2: 'Discerning Step', primaryHref: '/products?category=shoes', secondaryHref: '/products?category=new' },
-    { image: '/hero-3.png', eyebrow: 'Heritage', line1: 'Where Heritage', line2: 'Meets Luxury', primaryHref: '/products?category=clothing', secondaryHref: '/products?category=new' },
+    { image: '/hero-1.png', eyebrow: s.hero_1_eyebrow || 'SS26 Collection', line1: s.hero_1_line1 || 'Be Seen', line2: s.hero_1_line2 || 'Be Remembered', primaryHref: '/products', secondaryHref: '/products?category=new' },
+    { image: '/hero-2.png', eyebrow: s.hero_2_eyebrow || 'New Arrivals', line1: s.hero_2_line1 || 'Luxury is a Feeling', line2: s.hero_2_line2 || 'We Make it Real', primaryHref: '/products?category=shoes', secondaryHref: '/products?category=new' },
+    { image: '/hero-3.png', eyebrow: s.hero_3_eyebrow || 'Heritage', line1: s.hero_3_line1 || 'Less Noise', line2: s.hero_3_line2 || 'Pure Class.', primaryHref: '/products?category=clothing', secondaryHref: '/products?category=new' },
   ];
 
   const [currentSlide, setCurrentSlide] = useState(0);
   useEffect(() => {
-    const timer = setInterval(() => setCurrentSlide(prev => (prev + 1) % slides.length), 5500);
+    const timer = setInterval(() => setCurrentSlide(prev => (prev + 1) % slides.length), 4800);
     return () => clearInterval(timer);
   }, []);
 
@@ -244,7 +250,7 @@ export default function Home() {
           <span className="font-serif text-[120px] md:text-[200px] italic font-bold text-white/[0.03] select-none whitespace-nowrap group-hover:scale-105 transition-transform duration-[1.5s]">SALE SALE SALE</span>
         </div>
         <div className="relative z-10 text-center flex flex-col items-center">
-          <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light mb-2">Up to 60% off</h2>
+          <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light mb-2">{s.sale_banner_text || 'Up to 60% off'}</h2>
           <div className="flex items-center gap-4 text-[11px] uppercase tracking-[0.2em] group-hover:text-[#EAEAEA] transition-colors">
             <span>Shop Archive</span>
             <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>

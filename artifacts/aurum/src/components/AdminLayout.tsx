@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { apiUrl } from '../lib/api';
-import { LayoutDashboard, Package, Mail, ShoppingBag, LogOut, ChevronRight, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Mail, ShoppingBag, LogOut, ChevronRight, Menu, Settings } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -40,6 +40,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
     { href: '/admin/products', label: 'Products', icon: Package },
     { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
     { href: '/admin/newsletter', label: 'Newsletter', icon: Mail },
+    { href: '/admin/settings', label: 'Site Settings', icon: Settings },
   ];
 
   const Sidebar = () => (

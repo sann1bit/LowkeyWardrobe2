@@ -13,6 +13,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminProducts from "./pages/AdminProducts";
 import AdminNewsletter from "./pages/AdminNewsletter";
 import AdminOrders from "./pages/AdminOrders";
+import AdminSettings from "./pages/AdminSettings";
 
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -25,7 +26,7 @@ import { ChatWidget } from "./components/ChatWidget";
 
 const queryClient = new QueryClient();
 
-const ADMIN_ROUTES = ['/admin', '/admin/login', '/admin/products', '/admin/newsletter', '/admin/orders'];
+const ADMIN_ROUTES = ['/admin', '/admin/login', '/admin/products', '/admin/newsletter', '/admin/orders', '/admin/settings'];
 
 function isAdminRoute() {
   const path = window.location.pathname;
@@ -71,6 +72,7 @@ function Router() {
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/newsletter" component={AdminNewsletter} />
       <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/settings" component={AdminSettings} />
       <Route path="/admin" component={AdminDashboard} />
       <Route>
         <div className="min-h-screen flex items-center justify-center pt-[64px]">
