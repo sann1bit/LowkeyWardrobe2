@@ -1,12 +1,33 @@
 {
+  "functions": {
+    "api/storage/uploads/file.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "api/products.js": {
+      "maxDuration": 15
+    }
+  },
   "rewrites": [
     {
+      "source": "/api/storage/uploads/file",
+      "destination": "/api/storage/uploads/file"
+    },
+    {
       "source": "/api/products/:path*",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/products/:path*"
+      "destination": "/api/products"
     },
     {
       "source": "/api/products",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/products"
+      "destination": "/api/products"
+    },
+    {
+      "source": "/api/admin/products/:path*",
+      "destination": "/api/products"
+    },
+    {
+      "source": "/api/admin/products",
+      "destination": "/api/products"
     },
     {
       "source": "/api/admin/:path*",
