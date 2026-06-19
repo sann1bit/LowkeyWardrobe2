@@ -75,11 +75,12 @@
     "zod": "catalog:"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.1",
     "@uppy/aws-s3": "^5.1.0",
     "@uppy/core": "^5.2.0",
     "@uppy/dashboard": "^5.1.1",
     "@uppy/react": "^5.2.0",
-    "zustand": "^5.0.14",
-    "@workspace/object-storage-web": "workspace:*"
+    "@workspace/object-storage-web": "workspace:*",
+    "zustand": "^5.0.14"
   }
 }
