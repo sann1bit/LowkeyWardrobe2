@@ -14,16 +14,16 @@
       "destination": "/api/storage/uploads/file"
     },
     {
-      "source": "/api/products/:path*",
-      "destination": "/api/products"
+      "source": "/api/products/:id",
+      "destination": "/api/products?id=:id"
     },
     {
       "source": "/api/products",
       "destination": "/api/products"
     },
     {
-      "source": "/api/admin/products/:path*",
-      "destination": "/api/products"
+      "source": "/api/admin/products/:id",
+      "destination": "/api/products?id=:id"
     },
     {
       "source": "/api/admin/products",
@@ -32,10 +32,6 @@
     {
       "source": "/api/admin/:path*",
       "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/admin/:path*"
-    },
-    {
-      "source": "/api/admin",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/admin"
     },
     {
       "source": "/api/newsletter/:path*",

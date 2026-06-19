@@ -16,7 +16,7 @@ function sbHeaders(key, extra) {
   );
 }
 
-// ── JWT verification (HS256, built-in crypto only) ────────────────────────────
+// ── JWT verification ──────────────────────────────────────────────────────────
 
 function verifyJwt(req) {
   const auth = req.headers['authorization'] || '';
@@ -87,12 +87,8 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url = req.url || '';
-  const isAdmin = url.includes('/admin/') || url.includes('/admin');
-
-  if (isAdmin && !verifyJwt(req)) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  // Admin = valid JWT in Authorization header
+  const isAdmin = verifyJwt(req);
 
   let url_, key_;
   try { const s = sb(); url_ = s.url; key_ = s.key; }
@@ -101,32 +97,69 @@ export default async function handler(req, res) {
   const base = url_ + '/rest/v1/products';
   const h = sbHeaders(key_);
 
-  // Extract numeric ID from path: /api/products/42 or /api/admin/products/42
-  const idMatch = url.match(/\/products\/(\d+)/);
-  const id = idMatch ? idMatch[1] : null;
+  // ID comes from query param (set by Vercel rewrite) OR URL path
+  const q = req.query || {};
+  const idFromQuery = q.id;
+  const idFromPath = (req.url || '').match(/\/products\/(\d+)/)?.[1];
+  const id = idFromQuery || idFromPath || null;
 
   // ── GET ────────────────────────────────────────────────────────────────────
   if (req.method === 'GET') {
-    let endpoint;
     if (id) {
-      endpoint = base + '?id=eq.' + id + '&limit=1';
-    } else {
-      endpoint = base + '?order=id.asc';
-      if (!isAdmin) endpoint += '&is_active=eq.true';
-    }
-
-    const r = await fetch(endpoint, { headers: Object.assign({}, h, { Prefer: '' }) });
-    if (!r.ok) return res.status(r.status).json({ error: await r.text() });
-    const rows = await r.json();
-    if (id) {
+      // Single product by ID
+      const r = await fetch(base + '?id=eq.' + id + '&limit=1', {
+        headers: Object.assign({}, h, { Prefer: '' }),
+      });
+      if (!r.ok) return res.status(r.status).json({ error: await r.text() });
+      const rows = await r.json();
       if (!rows || rows.length === 0) return res.status(404).json({ error: 'Product not found' });
       return res.status(200).json(normalize(rows[0]));
     }
+
+    // Build Supabase query with filters
+    const params = new URLSearchParams();
+
+    // Active-only for public requests
+    if (!isAdmin) params.append('is_active', 'eq.true');
+
+    // Category filter
+    if (q.category) params.append('category', 'eq.' + q.category);
+
+    // Badge filter (new / sale)
+    if (q.badge) params.append('badge', 'eq.' + q.badge);
+
+    // Price range
+    if (q.minPrice) params.append('price', 'gte.' + q.minPrice);
+    if (q.maxPrice) params.append('price', 'lte.' + q.maxPrice);
+
+    // Full-text search via name/brand ilike
+    if (q.q) {
+      const term = q.q.replace(/[%_]/g, '\\$&');
+      params.append('or', `(name.ilike.*${term}*,brand.ilike.*${term}*)`);
+    }
+
+    // Sort
+    switch (q.sortBy) {
+      case 'price-asc':  params.append('order', 'price.asc');        break;
+      case 'price-desc': params.append('order', 'price.desc');       break;
+      case 'name-asc':   params.append('order', 'name.asc');         break;
+      case 'newest':     params.append('order', 'created_at.desc');  break;
+      default:           params.append('order', 'id.asc');           break;
+    }
+
+    const qs = params.toString();
+    const endpoint = base + (qs ? '?' + qs : '');
+    const r = await fetch(endpoint, { headers: Object.assign({}, h, { Prefer: '' }) });
+    if (!r.ok) return res.status(r.status).json({ error: await r.text() });
+    const rows = await r.json();
     return res.status(200).json((rows || []).map(normalize));
   }
 
+  // All write operations require admin JWT
+  if (!isAdmin) return res.status(401).json({ error: 'Unauthorized' });
+
   // ── POST (create) ──────────────────────────────────────────────────────────
-  if (req.method === 'POST' && isAdmin) {
+  if (req.method === 'POST') {
     const b = parseBody(req.body);
     if (!b.name || b.price == null) {
       return res.status(400).json({ error: 'name and price are required' });
@@ -146,7 +179,7 @@ export default async function handler(req, res) {
       sizes: b.sizes || [],
       description: b.description || '',
       image_url: b.imageUrl || images[0] || null,
-      images: images,
+      images,
       featured: b.featured || false,
       stock: Number(b.stock) || 0,
       tags: b.tags || [],
@@ -165,7 +198,7 @@ export default async function handler(req, res) {
   }
 
   // ── PUT / PATCH (update) ───────────────────────────────────────────────────
-  if ((req.method === 'PUT' || req.method === 'PATCH') && isAdmin && id) {
+  if ((req.method === 'PUT' || req.method === 'PATCH') && id) {
     const b = parseBody(req.body);
     const patch = {};
     if (b.name !== undefined) patch.name = b.name;
@@ -201,7 +234,7 @@ export default async function handler(req, res) {
   }
 
   // ── DELETE ─────────────────────────────────────────────────────────────────
-  if (req.method === 'DELETE' && isAdmin && id) {
+  if (req.method === 'DELETE' && id) {
     const r = await fetch(base + '?id=eq.' + id, {
       method: 'DELETE',
       headers: Object.assign({}, h, { Prefer: '' }),
