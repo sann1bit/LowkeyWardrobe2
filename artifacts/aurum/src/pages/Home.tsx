@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Truck, ShieldCheck, RefreshCw, Gift } from 'lucide-react';
 
+const DEFAULT_ORDER = ['marquee','categories','sale_banner','new_arrivals','editorial','brands','features','newsletter'];
+
 export default function Home() {
   const { data: apiProducts } = useListProducts();
   const { mutate: subscribe } = useSubscribeNewsletter();
@@ -14,10 +16,10 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [, setLocation] = useLocation();
-  const [siteSettings, setSiteSettings] = useState<Record<string, string>>({});
+  const [s, setS] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch('/api/settings').then(r => r.json()).then(setSiteSettings).catch(() => {});
+    fetch('/api/settings').then(r => r.json()).then(setS).catch(() => {});
   }, []);
 
   const displayProducts = apiProducts && apiProducts.length > 0 ? apiProducts : hardcodedProducts;
@@ -43,7 +45,6 @@ export default function Home() {
     { id: 'accessories', label: 'Accessories' }
   ];
 
-  const s = siteSettings;
   const slides = [
     { image: '/hero-1.png', eyebrow: s.hero_1_eyebrow || 'SS26 Collection', line1: s.hero_1_line1 || 'Be Seen', line2: s.hero_1_line2 || 'Be Remembered', primaryHref: '/products', secondaryHref: '/products?category=new' },
     { image: '/hero-2.png', eyebrow: s.hero_2_eyebrow || 'New Arrivals', line1: s.hero_2_line1 || 'Luxury is a Feeling', line2: s.hero_2_line2 || 'We Make it Real', primaryHref: '/products?category=shoes', secondaryHref: '/products?category=new' },
@@ -56,10 +57,261 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  // Parse section order from settings
+  const sectionOrder: string[] = (() => {
+    try { const arr = JSON.parse(s.home_section_order || '[]'); return Array.isArray(arr) && arr.length > 0 ? arr : DEFAULT_ORDER; }
+    catch { return DEFAULT_ORDER; }
+  })();
+
+  const visible = (key: string) => s[`show_${key}`] !== 'false';
+
+  const renderSection = (id: string) => {
+    switch (id) {
+
+      case 'marquee':
+        if (!visible('marquee')) return null;
+        return (
+          <div key="marquee" className="bg-black text-white py-3.5 overflow-hidden flex whitespace-nowrap">
+            <div className="animate-marquee inline-block">
+              {[1, 2, 3].map(i => (
+                <span key={i} className="text-[11px] font-light tracking-[0.2em] uppercase mx-4">
+                  {s.marquee_text || 'Free shipping on orders over PKR 15,000 · Complimentary gift wrapping · SS26 Collection — Now Available · 7-day returns · Exclusive member benefits ·'}
+                </span>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'categories':
+        return (
+          <section key="categories" className="grid grid-cols-1 md:grid-cols-4 gap-[1px] bg-[#EAEAEA]">
+            {/* Clothing */}
+            <div onClick={() => setLocation('/products?category=clothing')}
+              className="group cursor-pointer relative md:col-span-2 min-h-[520px] bg-white flex flex-col p-10 lg:p-14 overflow-hidden">
+              <img src="/category-clothing.png" alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-60 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none" draggable={false} />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/30 to-white/10 pointer-events-none" />
+              <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
+              <div className="relative z-10 flex items-center justify-between mb-auto">
+                <span className="font-serif text-[11px] italic text-black/20 tracking-[0.05em]">01</span>
+                <span className="text-[9px] uppercase tracking-[0.4em] text-black/25 font-light">Clothing</span>
+              </div>
+              <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
+                <div className="h-[1px] bg-black/8 mb-10 w-full" />
+                <h2 className="font-serif text-[clamp(60px,7vw,108px)] italic font-light leading-[0.92] tracking-[-0.02em] text-black group-hover:translate-x-1.5 transition-transform duration-700 ease-out">Clothing</h2>
+                <div className="h-[1px] bg-black/8 mt-10 w-full" />
+              </div>
+              <div className="relative z-10 flex items-end justify-between mt-auto">
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3 font-light">Menswear · Womenswear · Unisex</p>
+                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-black">
+                    <span className="border-b border-black/20 pb-0.5 group-hover:border-black transition-colors duration-300">Explore Collection</span>
+                    <span className="group-hover:translate-x-2 transition-transform duration-400">→</span>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out delay-100 z-10" />
+            </div>
+
+            {/* Shoes */}
+            <div onClick={() => setLocation('/products?category=shoes')}
+              className="group cursor-pointer relative min-h-[520px] bg-[#0a0a0a] flex flex-col p-10 lg:p-12 overflow-hidden">
+              <img src="/category-shoes.png" alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-55 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none" draggable={false} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20 pointer-events-none" />
+              <div className="absolute top-0 left-0 h-[1px] bg-white w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
+              <div className="relative z-10 flex items-center justify-between mb-auto">
+                <span className="font-serif text-[11px] italic text-white/20 tracking-[0.05em]">02</span>
+                <span className="text-[9px] uppercase tracking-[0.4em] text-white/25 font-light">Shoes</span>
+              </div>
+              <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
+                <div className="h-[1px] bg-white/8 mb-10 w-full" />
+                <h2 className="font-serif text-[clamp(60px,5vw,90px)] italic font-light leading-[0.92] tracking-[-0.02em] text-white group-hover:translate-x-1.5 transition-transform duration-700 ease-out">Shoes</h2>
+                <div className="h-[1px] bg-white/8 mt-10 w-full" />
+              </div>
+              <div className="relative z-10 flex items-end justify-between mt-auto">
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.3em] text-white/25 mb-3 font-light">Menswear · Womenswear · Unisex</p>
+                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-white">
+                    <span className="border-b border-white/20 pb-0.5 group-hover:border-white transition-colors duration-300">Step Forward</span>
+                    <span className="group-hover:translate-x-2 transition-transform duration-400">→</span>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 h-[1px] bg-white w-0 group-hover:w-full transition-all duration-700 ease-out delay-100 z-10" />
+            </div>
+
+            {/* Accessories */}
+            <div onClick={() => setLocation('/products?category=accessories')}
+              className="group cursor-pointer relative min-h-[520px] bg-[#F4F4F4] flex flex-col p-10 lg:p-12 overflow-hidden">
+              <img src="/category-accessories.png" alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-60 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none" draggable={false} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#F4F4F4]/95 via-[#F4F4F4]/30 to-[#F4F4F4]/10 pointer-events-none" />
+              <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
+              <div className="relative z-10 flex items-center justify-between mb-auto">
+                <span className="font-serif text-[11px] italic text-black/20 tracking-[0.05em]">03</span>
+                <span className="text-[9px] uppercase tracking-[0.4em] text-black/25 font-light">Accessories</span>
+              </div>
+              <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
+                <div className="h-[1px] bg-black/8 mb-10 w-full" />
+                <h2 className="font-serif text-[clamp(40px,4vw,68px)] italic font-light leading-[0.92] tracking-[-0.02em] text-black group-hover:translate-x-1.5 transition-transform duration-700 ease-out">Acces&shy;sories</h2>
+                <div className="h-[1px] bg-black/8 mt-10 w-full" />
+              </div>
+              <div className="relative z-10 flex items-end justify-between mt-auto">
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3 font-light">Menswear · Womenswear · Unisex</p>
+                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-black">
+                    <span className="border-b border-black/20 pb-0.5 group-hover:border-black transition-colors duration-300">The Details</span>
+                    <span className="group-hover:translate-x-2 transition-transform duration-400">→</span>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out delay-100 z-10" />
+            </div>
+          </section>
+        );
+
+      case 'sale_banner':
+        if (!visible('sale_banner')) return null;
+        return (
+          <section key="sale_banner" onClick={() => setLocation('/products?category=sale')}
+            className="cursor-pointer group relative bg-black text-white h-[180px] flex items-center justify-center overflow-hidden mt-[1px]">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="font-serif text-[120px] md:text-[200px] italic font-bold text-white/[0.03] select-none whitespace-nowrap group-hover:scale-105 transition-transform duration-[1.5s]">SALE SALE SALE</span>
+            </div>
+            <div className="relative z-10 text-center flex flex-col items-center">
+              <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light mb-2">{s.sale_banner_text || 'Up to 60% off'}</h2>
+              <div className="flex items-center gap-4 text-[11px] uppercase tracking-[0.2em] group-hover:text-[#EAEAEA] transition-colors">
+                <span>Shop Archive</span>
+                <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'new_arrivals':
+        if (!visible('new_arrivals')) return null;
+        return (
+          <section key="new_arrivals" className="py-24 px-8 max-w-[1600px] mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
+              <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light leading-[1.15]">
+                {s.new_arrivals_title || 'New Arrivals'}
+              </h2>
+              <div className="flex gap-6 border-b border-[#EAEAEA] pb-4 overflow-x-auto no-scrollbar">
+                {tabs.map(tab => (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                    className={`text-[11px] uppercase tracking-[0.15em] whitespace-nowrap transition-colors relative ${activeTab === tab.id ? 'text-black' : 'text-[#999999] hover:text-black'}`}>
+                    {tab.label}
+                    {activeTab === tab.id && <motion.div layoutId="activeTab" className="absolute -bottom-[17px] left-0 right-0 h-[1px] bg-black" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[2px] bg-[#EAEAEA] border border-[#EAEAEA]">
+              {filteredArrivals.map(product => (
+                <div key={product.id} className="bg-white"><ProductCard product={product as any} /></div>
+              ))}
+            </div>
+            <div className="mt-16 flex justify-center">
+              <Link href="/products">
+                <button className="border border-black px-10 py-4 text-[11px] uppercase tracking-[0.15em] hover:bg-black hover:text-white transition-colors duration-300">
+                  {s.new_arrivals_cta || 'View All Products'}
+                </button>
+              </Link>
+            </div>
+          </section>
+        );
+
+      case 'editorial':
+        if (!visible('editorial')) return null;
+        return (
+          <section key="editorial" className="my-20 mx-8 grid grid-cols-1 lg:grid-cols-2 gap-[2px] min-h-[600px] bg-white">
+            <div className="relative p-12 lg:p-20 flex flex-col justify-end group cursor-pointer overflow-hidden min-h-[400px] bg-[#F0F0F0]">
+              <span className="absolute top-10 left-12 text-[10px] uppercase tracking-[0.2em] font-medium border border-black/10 px-3 py-1 bg-white/50 backdrop-blur-sm">Editorial</span>
+              <div className="relative z-10">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#666666] mb-4">The Edit</p>
+                <h3 className="font-serif text-[38px] italic leading-[1.1] mb-6 max-w-[400px]">Autumn Winter Collection 2026</h3>
+                <div className="flex items-center gap-4 text-[11px] uppercase tracking-[0.2em]">
+                  <span className="border-b border-black pb-1">Explore the look</span>
+                  <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-rows-2 gap-[2px]">
+              <div className="bg-[#1A1A1A] text-white p-12 flex flex-col justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/80 to-transparent z-10" />
+                <div className="relative z-20">
+                  <h3 className="font-serif text-[28px] italic leading-[1.2] max-w-[300px] mb-4 text-[#F5F5F5]">Sustainably sourced, meticulously made</h3>
+                  <p className="text-[13px] font-light text-white/60 max-w-[280px]">We believe true luxury honors both the craft and the environment.</p>
+                </div>
+              </div>
+              <div className="bg-[#EAEAEA] p-12 flex flex-col justify-center relative overflow-hidden group cursor-pointer">
+                <div className="relative z-20">
+                  <h3 className="font-serif text-[28px] italic leading-[1.2] max-w-[300px] mb-6">Exclusive access to private sales</h3>
+                  <div className="flex items-center gap-4 text-[11px] uppercase tracking-[0.2em]">
+                    <span className="border-b border-black pb-1">Join Us</span>
+                    <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'brands':
+        if (!visible('brands')) return null;
+        return (
+          <section key="brands" className="py-20 border-y border-[#EAEAEA] overflow-hidden">
+            <div className="max-w-[1400px] mx-auto px-8 flex flex-wrap justify-center md:justify-between items-center gap-8 md:gap-4">
+              {["Maison Noir", "Vesti Arte", "Luxe & Co", "Forma", "Atelier M", "Essence"].map(brand => (
+                <span key={brand} className="font-serif text-[18px] md:text-[22px] font-medium tracking-[0.1em] opacity-25 hover:opacity-60 transition-opacity cursor-pointer whitespace-nowrap">{brand}</span>
+              ))}
+            </div>
+          </section>
+        );
+
+      case 'features':
+        if (!visible('features')) return null;
+        return (
+          <section key="features" className="py-32 px-8 max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+              {[
+                { icon: Truck, title: 'Free Shipping', desc: `Complimentary delivery on all orders over PKR ${Number(s.free_shipping_threshold || 15000).toLocaleString()}` },
+                { icon: ShieldCheck, title: 'Authenticity Guaranteed', desc: 'Every piece is verified and certified before delivery' },
+                { icon: RefreshCw, title: '30-Day Returns', desc: 'Hassle-free returns within 30 days, no questions asked' },
+                { icon: Gift, title: 'Luxury Packaging', desc: 'Beautifully packaged in our signature gift boxes' },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 border border-[#EAEAEA] rounded-full flex items-center justify-center mb-6"><Icon size={20} strokeWidth={1} /></div>
+                  <h4 className="text-[12px] tracking-[0.15em] uppercase font-normal mb-3">{title}</h4>
+                  <p className="text-[13px] text-[#999999] font-light leading-[1.7] max-w-[240px]">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+
+      case 'newsletter':
+        return (
+          <section key="newsletter" className="bg-black text-white py-32 px-8 flex flex-col items-center text-center">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 mb-6">Stay Connected</span>
+            <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light mb-6">The Inner Circle</h2>
+            <p className="text-[14px] font-light text-white/70 max-w-[420px] mb-10 leading-[1.8]">
+              {s.newsletter_tagline || 'First access to new collections, exclusive events, and members-only offers.'}
+            </p>
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row w-full max-w-[480px] border border-white/20 focus-within:border-white transition-colors">
+              <input type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required className="flex-1 bg-transparent px-6 py-4 text-[13px] outline-none placeholder:text-white/30" />
+              <button type="submit" className="bg-white text-black px-8 py-4 text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-[#EAEAEA] transition-colors">Subscribe</button>
+            </form>
+          </section>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="w-full bg-white text-black min-h-[100dvh] pt-[64px]">
 
-      {/* HERO SLIDESHOW */}
+      {/* HERO SLIDESHOW — always first */}
       <section className="relative h-[calc(100vh-64px)] min-h-[600px] overflow-hidden bg-black">
         <AnimatePresence mode="sync">
           <motion.div key={currentSlide} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1, ease: 'easeInOut' }} className="absolute inset-0">
@@ -76,8 +328,16 @@ export default function Home() {
                 <span className="font-medium block">{slides[currentSlide].line2}</span>
               </h1>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href={slides[currentSlide].primaryHref}><button className="bg-white text-black hover:bg-black hover:text-white border border-white px-10 py-3.5 text-[11px] uppercase tracking-[0.18em] transition-colors duration-300 min-w-[180px]">Shop Collection</button></Link>
-                <Link href={slides[currentSlide].secondaryHref}><button className="border border-white text-white hover:bg-white hover:text-black px-10 py-3.5 text-[11px] uppercase tracking-[0.18em] transition-colors duration-300 min-w-[180px]">New Arrivals</button></Link>
+                <Link href={slides[currentSlide].primaryHref}>
+                  <button className="bg-white text-black hover:bg-black hover:text-white border border-white px-10 py-3.5 text-[11px] uppercase tracking-[0.18em] transition-colors duration-300 min-w-[180px]">
+                    {s.hero_cta_primary || 'Shop Collection'}
+                  </button>
+                </Link>
+                <Link href={slides[currentSlide].secondaryHref}>
+                  <button className="border border-white text-white hover:bg-white hover:text-black px-10 py-3.5 text-[11px] uppercase tracking-[0.18em] transition-colors duration-300 min-w-[180px]">
+                    {s.hero_cta_secondary || 'New Arrivals'}
+                  </button>
+                </Link>
               </div>
             </motion.div>
           </AnimatePresence>
@@ -91,266 +351,8 @@ export default function Home() {
         <button onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)} className="absolute right-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 border border-white/30 flex items-center justify-center text-white hover:bg-white/10 transition-colors">→</button>
       </section>
 
-      {/* MARQUEE */}
-      <div className="bg-black text-white py-3.5 overflow-hidden flex whitespace-nowrap">
-        <div className="animate-marquee inline-block">
-          {[1, 2, 3].map(i => (
-            <span key={i} className="text-[11px] font-light tracking-[0.2em] uppercase mx-4">Free shipping on orders over PKR 15,000 · Complimentary gift wrapping · SS26 Collection — Now Available · 7-day returns · Exclusive member benefits ·</span>
-          ))}
-        </div>
-      </div>
-
-      {/* CATEGORIES — Luxury Editorial B&W */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-[1px] bg-[#EAEAEA]">
-
-        {/* Clothing — Wide, Pure White */}
-        <div
-          onClick={() => setLocation('/products?category=clothing')}
-          className="group cursor-pointer relative md:col-span-2 min-h-[520px] bg-white flex flex-col p-10 lg:p-14 overflow-hidden"
-        >
-          {/* Background image — full cover */}
-          <img
-            src="/category-clothing.png"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-60 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
-            draggable={false}
-          />
-          {/* Overlay: stronger at bottom/left for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/30 to-white/10 pointer-events-none" />
-
-          {/* Top animated line */}
-          <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
-
-          {/* Editorial header */}
-          <div className="relative z-10 flex items-center justify-between mb-auto">
-            <span className="font-serif text-[11px] italic text-black/20 tracking-[0.05em]">01</span>
-            <span className="text-[9px] uppercase tracking-[0.4em] text-black/25 font-light">Clothing</span>
-          </div>
-
-          {/* Large serif title */}
-          <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
-            <div className="h-[1px] bg-black/8 mb-10 w-full" />
-            <h2 className="font-serif text-[clamp(60px,7vw,108px)] italic font-light leading-[0.92] tracking-[-0.02em] text-black group-hover:translate-x-1.5 transition-transform duration-700 ease-out">
-              Clothing
-            </h2>
-            <div className="h-[1px] bg-black/8 mt-10 w-full" />
-          </div>
-
-          {/* Bottom */}
-          <div className="relative z-10 flex items-end justify-between mt-auto">
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3 font-light">
-                Menswear · Womenswear · Unisex
-              </p>
-              <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-black">
-                <span className="border-b border-black/20 pb-0.5 group-hover:border-black transition-colors duration-300">Explore Collection</span>
-                <span className="group-hover:translate-x-2 transition-transform duration-400">→</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom animated line */}
-          <div className="absolute bottom-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out delay-100 z-10" />
-        </div>
-
-        {/* Shoes — Pure Black */}
-        <div
-          onClick={() => setLocation('/products?category=shoes')}
-          className="group cursor-pointer relative min-h-[520px] bg-[#0a0a0a] flex flex-col p-10 lg:p-12 overflow-hidden"
-        >
-          {/* Background image — full cover */}
-          <img
-            src="/category-shoes.png"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-55 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
-            draggable={false}
-          />
-          {/* Dark overlay: stronger at bottom for text */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20 pointer-events-none" />
-
-          <div className="absolute top-0 left-0 h-[1px] bg-white w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
-
-          <div className="relative z-10 flex items-center justify-between mb-auto">
-            <span className="font-serif text-[11px] italic text-white/20 tracking-[0.05em]">02</span>
-            <span className="text-[9px] uppercase tracking-[0.4em] text-white/25 font-light">Shoes</span>
-          </div>
-
-          <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
-            <div className="h-[1px] bg-white/8 mb-10 w-full" />
-            <h2 className="font-serif text-[clamp(60px,5vw,90px)] italic font-light leading-[0.92] tracking-[-0.02em] text-white group-hover:translate-x-1.5 transition-transform duration-700 ease-out">
-              Shoes
-            </h2>
-            <div className="h-[1px] bg-white/8 mt-10 w-full" />
-          </div>
-
-          <div className="relative z-10 flex items-end justify-between mt-auto">
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.3em] text-white/25 mb-3 font-light">
-                Menswear · Womenswear · Unisex
-              </p>
-              <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-white">
-                <span className="border-b border-white/20 pb-0.5 group-hover:border-white transition-colors duration-300">Step Forward</span>
-                <span className="group-hover:translate-x-2 transition-transform duration-400">→</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute bottom-0 left-0 h-[1px] bg-white w-0 group-hover:w-full transition-all duration-700 ease-out delay-100 z-10" />
-        </div>
-
-        {/* Accessories — Light Gray */}
-        <div
-          onClick={() => setLocation('/products?category=accessories')}
-          className="group cursor-pointer relative min-h-[520px] bg-[#F4F4F4] flex flex-col p-10 lg:p-12 overflow-hidden"
-        >
-          {/* Background image — full cover */}
-          <img
-            src="/category-accessories.png"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-60 group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out select-none pointer-events-none"
-            draggable={false}
-          />
-          {/* Overlay: stronger at bottom for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F4F4F4]/95 via-[#F4F4F4]/30 to-[#F4F4F4]/10 pointer-events-none" />
-
-          <div className="absolute top-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out z-10" />
-
-          <div className="relative z-10 flex items-center justify-between mb-auto">
-            <span className="font-serif text-[11px] italic text-black/20 tracking-[0.05em]">03</span>
-            <span className="text-[9px] uppercase tracking-[0.4em] text-black/25 font-light">Accessories</span>
-          </div>
-
-          <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
-            <div className="h-[1px] bg-black/8 mb-10 w-full" />
-            <h2 className="font-serif text-[clamp(40px,4vw,68px)] italic font-light leading-[0.92] tracking-[-0.02em] text-black group-hover:translate-x-1.5 transition-transform duration-700 ease-out">
-              Acces&shy;sories
-            </h2>
-            <div className="h-[1px] bg-black/8 mt-10 w-full" />
-          </div>
-
-          <div className="relative z-10 flex items-end justify-between mt-auto">
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3 font-light">
-                Menswear · Womenswear · Unisex
-              </p>
-              <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-black">
-                <span className="border-b border-black/20 pb-0.5 group-hover:border-black transition-colors duration-300">The Details</span>
-                <span className="group-hover:translate-x-2 transition-transform duration-400">→</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute bottom-0 left-0 h-[1px] bg-black w-0 group-hover:w-full transition-all duration-700 ease-out delay-100 z-10" />
-        </div>
-      </section>
-
-      {/* SALE BANNER */}
-      <section onClick={() => setLocation('/products?category=sale')} className="cursor-pointer group relative bg-black text-white h-[180px] flex items-center justify-center overflow-hidden mt-[1px]">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="font-serif text-[120px] md:text-[200px] italic font-bold text-white/[0.03] select-none whitespace-nowrap group-hover:scale-105 transition-transform duration-[1.5s]">SALE SALE SALE</span>
-        </div>
-        <div className="relative z-10 text-center flex flex-col items-center">
-          <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light mb-2">{s.sale_banner_text || 'Up to 60% off'}</h2>
-          <div className="flex items-center gap-4 text-[11px] uppercase tracking-[0.2em] group-hover:text-[#EAEAEA] transition-colors">
-            <span>Shop Archive</span>
-            <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
-          </div>
-        </div>
-      </section>
-
-      {/* NEW ARRIVALS */}
-      <section className="py-24 px-8 max-w-[1600px] mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
-          <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light leading-[1.15]">New Arrivals</h2>
-          <div className="flex gap-6 border-b border-[#EAEAEA] pb-4 overflow-x-auto no-scrollbar">
-            {tabs.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`text-[11px] uppercase tracking-[0.15em] whitespace-nowrap transition-colors relative ${activeTab === tab.id ? 'text-black' : 'text-[#999999] hover:text-black'}`}>
-                {tab.label}
-                {activeTab === tab.id && <motion.div layoutId="activeTab" className="absolute -bottom-[17px] left-0 right-0 h-[1px] bg-black" />}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[2px] bg-[#EAEAEA] border border-[#EAEAEA]">
-          {filteredArrivals.map(product => (
-            <div key={product.id} className="bg-white"><ProductCard product={product as any} /></div>
-          ))}
-        </div>
-        <div className="mt-16 flex justify-center">
-          <Link href="/products"><button className="border border-black px-10 py-4 text-[11px] uppercase tracking-[0.15em] hover:bg-black hover:text-white transition-colors duration-300">View All Products</button></Link>
-        </div>
-      </section>
-
-      {/* EDITORIAL */}
-      <section className="my-20 mx-8 grid grid-cols-1 lg:grid-cols-2 gap-[2px] min-h-[600px] bg-white">
-        <div className="relative p-12 lg:p-20 flex flex-col justify-end group cursor-pointer overflow-hidden min-h-[400px] bg-[#F0F0F0]">
-          <span className="absolute top-10 left-12 text-[10px] uppercase tracking-[0.2em] font-medium border border-black/10 px-3 py-1 bg-white/50 backdrop-blur-sm">Editorial</span>
-          <div className="relative z-10">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-[#666666] mb-4">The Edit</p>
-            <h3 className="font-serif text-[38px] italic leading-[1.1] mb-6 max-w-[400px]">Autumn Winter Collection 2026</h3>
-            <div className="flex items-center gap-4 text-[11px] uppercase tracking-[0.2em]">
-              <span className="border-b border-black pb-1">Explore the look</span>
-              <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-rows-2 gap-[2px]">
-          <div className="bg-[#1A1A1A] text-white p-12 flex flex-col justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-tr from-black/80 to-transparent z-10" />
-            <div className="relative z-20">
-              <h3 className="font-serif text-[28px] italic leading-[1.2] max-w-[300px] mb-4 text-[#F5F5F5]">Sustainably sourced, meticulously made</h3>
-              <p className="text-[13px] font-light text-white/60 max-w-[280px]">We believe true luxury honors both the craft and the environment.</p>
-            </div>
-          </div>
-          <div className="bg-[#EAEAEA] p-12 flex flex-col justify-center relative overflow-hidden group cursor-pointer">
-            <div className="relative z-20">
-              <h3 className="font-serif text-[28px] italic leading-[1.2] max-w-[300px] mb-6">Exclusive access to private sales</h3>
-              <div className="flex items-center gap-4 text-[11px] uppercase tracking-[0.2em]">
-                <span className="border-b border-black pb-1">Join Us</span>
-                <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BRANDS */}
-      <section className="py-20 border-y border-[#EAEAEA] overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-8 flex flex-wrap justify-center md:justify-between items-center gap-8 md:gap-4">
-          {["Maison Noir", "Vesti Arte", "Luxe & Co", "Forma", "Atelier M", "Essence"].map(brand => (
-            <span key={brand} className="font-serif text-[18px] md:text-[22px] font-medium tracking-[0.1em] opacity-25 hover:opacity-60 transition-opacity cursor-pointer whitespace-nowrap">{brand}</span>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="py-32 px-8 max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-          {[
-            { icon: Truck, title: 'Free Shipping', desc: 'Complimentary delivery on all orders over PKR 15,000' },
-            { icon: ShieldCheck, title: 'Authenticity Guaranteed', desc: 'Every piece is verified and certified before delivery' },
-            { icon: RefreshCw, title: '30-Day Returns', desc: 'Hassle-free returns within 30 days, no questions asked' },
-            { icon: Gift, title: 'Luxury Packaging', desc: 'Beautifully packaged in our signature gift boxes' },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 border border-[#EAEAEA] rounded-full flex items-center justify-center mb-6"><Icon size={20} strokeWidth={1} /></div>
-              <h4 className="text-[12px] tracking-[0.15em] uppercase font-normal mb-3">{title}</h4>
-              <p className="text-[13px] text-[#999999] font-light leading-[1.7] max-w-[240px]">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* NEWSLETTER */}
-      <section className="bg-black text-white py-32 px-8 flex flex-col items-center text-center">
-        <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 mb-6">Stay Connected</span>
-        <h2 className="font-serif text-[clamp(36px,4vw,56px)] italic font-light mb-6">The Inner Circle</h2>
-        <p className="text-[14px] font-light text-white/70 max-w-[420px] mb-10 leading-[1.8]">First access to new collections, exclusive events, and members-only offers.</p>
-        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row w-full max-w-[480px] border border-white/20 focus-within:border-white transition-colors">
-          <input type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required className="flex-1 bg-transparent px-6 py-4 text-[13px] outline-none placeholder:text-white/30" />
-          <button type="submit" className="bg-white text-black px-8 py-4 text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-[#EAEAEA] transition-colors">Subscribe</button>
-        </form>
-      </section>
+      {/* DYNAMIC SECTIONS — ordered & toggled from site settings */}
+      {sectionOrder.map(id => renderSection(id))}
 
     </div>
   );

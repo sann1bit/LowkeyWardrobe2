@@ -1,57 +1,23 @@
 {
   "functions": {
-    "api/storage/uploads/file.js": {
-      "maxDuration": 30,
-      "memory": 1024
-    },
-    "api/products.js": {
-      "maxDuration": 15
-    }
+    "api/storage/uploads/file.js": { "maxDuration": 30, "memory": 1024 },
+    "api/products.js": { "maxDuration": 15 },
+    "api/settings.js": { "maxDuration": 10 }
   },
   "rewrites": [
-    {
-      "source": "/api/storage/uploads/file",
-      "destination": "/api/storage/uploads/file"
-    },
-    {
-      "source": "/api/products/:id",
-      "destination": "/api/products?id=:id"
-    },
-    {
-      "source": "/api/products",
-      "destination": "/api/products"
-    },
-    {
-      "source": "/api/admin/products/:id",
-      "destination": "/api/products?id=:id"
-    },
-    {
-      "source": "/api/admin/products",
-      "destination": "/api/products"
-    },
-    {
-      "source": "/api/admin/:path*",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/admin/:path*"
-    },
-    {
-      "source": "/api/newsletter/:path*",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/newsletter/:path*"
-    },
-    {
-      "source": "/api/newsletter",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/newsletter"
-    },
-    {
-      "source": "/api/orders/:path*",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/orders/:path*"
-    },
-    {
-      "source": "/api/orders",
-      "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/orders"
-    },
-    {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/storage/uploads/file", "destination": "/api/storage/uploads/file" },
+    { "source": "/api/products/:id",          "destination": "/api/products?id=:id" },
+    { "source": "/api/products",              "destination": "/api/products" },
+    { "source": "/api/admin/products/:id",    "destination": "/api/products?id=:id" },
+    { "source": "/api/admin/products",        "destination": "/api/products" },
+    { "source": "/api/settings",              "destination": "/api/settings" },
+    { "source": "/api/admin/settings/:key",   "destination": "/api/settings?key=:key" },
+    { "source": "/api/admin/settings",        "destination": "/api/settings" },
+    { "source": "/api/admin/:path*",          "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/admin/:path*" },
+    { "source": "/api/newsletter/:path*",     "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/newsletter/:path*" },
+    { "source": "/api/newsletter",            "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/newsletter" },
+    { "source": "/api/orders/:path*",         "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/orders/:path*" },
+    { "source": "/api/orders",                "destination": "https://workspaceapi-server-production-476e.up.railway.app/api/orders" },
+    { "source": "/((?!api).*)",               "destination": "/index.html" }
   ]
 }
