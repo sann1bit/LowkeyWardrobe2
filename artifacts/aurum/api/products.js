@@ -1,45 +1,44 @@
-const crypto = require("crypto");
+import { randomUUID, createHmac } from 'crypto';
 
-// ── Supabase helpers ─────────────────────────────────────────────────────────
+// ── Supabase helpers ──────────────────────────────────────────────────────────
 
 function sb() {
-  const url = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-  if (!url || !key) throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set");
+  const url = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
   return { url, key };
 }
 
 function sbHeaders(key, extra) {
   return Object.assign(
-    { Authorization: "Bearer " + key, apikey: key, "Content-Type": "application/json", Prefer: "return=representation" },
+    { Authorization: 'Bearer ' + key, apikey: key, 'Content-Type': 'application/json', Prefer: 'return=representation' },
     extra || {}
   );
 }
 
-// ── JWT verification (HS256, built-in crypto only) ───────────────────────────
+// ── JWT verification (HS256, built-in crypto only) ────────────────────────────
 
 function verifyJwt(req) {
-  const auth = req.headers["authorization"] || "";
-  if (!auth.startsWith("Bearer ")) return false;
+  const auth = req.headers['authorization'] || '';
+  if (!auth.startsWith('Bearer ')) return false;
   const token = auth.slice(7);
-  const parts = token.split(".");
+  const parts = token.split('.');
   if (parts.length !== 3) return false;
   try {
-    const secret = process.env.SESSION_SECRET || "";
-    const sig = crypto
-      .createHmac("sha256", secret)
-      .update(parts[0] + "." + parts[1])
-      .digest("base64")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+    const secret = process.env.SESSION_SECRET || '';
+    const sig = createHmac('sha256', secret)
+      .update(parts[0] + '.' + parts[1])
+      .digest('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
     return sig === parts[2];
   } catch (_) {
     return false;
   }
 }
 
-// ── Normalize DB row → API shape ─────────────────────────────────────────────
+// ── Normalize DB row → API shape ──────────────────────────────────────────────
 
 function normalize(p) {
   return {
@@ -54,119 +53,119 @@ function normalize(p) {
     badge: p.badge || null,
     colors: p.colors || [],
     sizes: p.sizes || [],
-    description: p.description || "",
+    description: p.description || '',
     imageUrl: p.image_url || null,
     images: p.images || [],
     featured: p.featured || false,
-    sku: p.sku || "",
+    sku: p.sku || '',
     stock: Number(p.stock) || 0,
     tags: p.tags || [],
     isActive: p.is_active !== false,
-    figType: p.fig_type || "a",
-    bgGradient: p.bg_gradient || "#f5f5f5",
-    figColorA: p.fig_color_a || "#cccccc",
-    figColorB: p.fig_color_b || "#aaaaaa",
+    figType: p.fig_type || 'a',
+    bgGradient: p.bg_gradient || '#f5f5f5',
+    figColorA: p.fig_color_a || '#cccccc',
+    figColorB: p.fig_color_b || '#aaaaaa',
     createdAt: p.created_at || null,
   };
 }
 
 function parseBody(body) {
   if (!body) return {};
-  if (typeof body === "string") { try { return JSON.parse(body); } catch (_) { return {}; } }
+  if (typeof body === 'string') { try { return JSON.parse(body); } catch (_) { return {}; } }
   return body;
 }
 
 function slugify(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
-// ── Main handler ─────────────────────────────────────────────────────────────
+// ── Main handler ──────────────────────────────────────────────────────────────
 
-module.exports = async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") return res.status(200).end();
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url = req.url || "";
-  const isAdmin = url.includes("/admin/");
+  const url = req.url || '';
+  const isAdmin = url.includes('/admin/') || url.includes('/admin');
 
   if (isAdmin && !verifyJwt(req)) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   let url_, key_;
   try { const s = sb(); url_ = s.url; key_ = s.key; }
   catch (err) { return res.status(500).json({ error: err.message }); }
 
-  const base = url_ + "/rest/v1/products";
+  const base = url_ + '/rest/v1/products';
   const h = sbHeaders(key_);
 
   // Extract numeric ID from path: /api/products/42 or /api/admin/products/42
   const idMatch = url.match(/\/products\/(\d+)/);
   const id = idMatch ? idMatch[1] : null;
 
-  // ── GET ──────────────────────────────────────────────────────────────────
-  if (req.method === "GET") {
+  // ── GET ────────────────────────────────────────────────────────────────────
+  if (req.method === 'GET') {
     let endpoint;
     if (id) {
-      endpoint = base + "?id=eq." + id + "&limit=1";
+      endpoint = base + '?id=eq.' + id + '&limit=1';
     } else {
-      endpoint = base + "?order=id.desc";
-      if (!isAdmin) endpoint += "&is_active=eq.true";
+      endpoint = base + '?order=id.asc';
+      if (!isAdmin) endpoint += '&is_active=eq.true';
     }
 
-    const r = await fetch(endpoint, { headers: Object.assign({}, h, { Prefer: "" }) });
+    const r = await fetch(endpoint, { headers: Object.assign({}, h, { Prefer: '' }) });
     if (!r.ok) return res.status(r.status).json({ error: await r.text() });
     const rows = await r.json();
     if (id) {
-      if (!rows || rows.length === 0) return res.status(404).json({ error: "Product not found" });
+      if (!rows || rows.length === 0) return res.status(404).json({ error: 'Product not found' });
       return res.status(200).json(normalize(rows[0]));
     }
     return res.status(200).json((rows || []).map(normalize));
   }
 
-  // ── POST (create) ────────────────────────────────────────────────────────
-  if (req.method === "POST" && isAdmin) {
+  // ── POST (create) ──────────────────────────────────────────────────────────
+  if (req.method === 'POST' && isAdmin) {
     const b = parseBody(req.body);
     if (!b.name || b.price == null) {
-      return res.status(400).json({ error: "name and price are required" });
+      return res.status(400).json({ error: 'name and price are required' });
     }
     const images = Array.isArray(b.images) ? b.images.filter(Boolean) : [];
     const payload = {
       name: b.name,
-      slug: slugify(b.name) + "-" + Date.now(),
-      sku: b.sku || ("LKW-" + crypto.randomUUID().slice(0, 8).toUpperCase()),
-      brand: b.brand || "Lowkey Wardrobe",
+      slug: slugify(b.name) + '-' + Date.now(),
+      sku: b.sku || ('LKW-' + randomUUID().slice(0, 8).toUpperCase()),
+      brand: b.brand || 'Lowkey Wardrobe',
       price: Number(b.price),
       original_price: b.originalPrice ? Number(b.originalPrice) : null,
-      category: b.category || "clothing",
+      category: b.category || 'clothing',
       subcategory: b.subcategory || null,
       badge: b.badge || null,
       colors: b.colors || [],
       sizes: b.sizes || [],
-      description: b.description || "",
+      description: b.description || '',
       image_url: b.imageUrl || images[0] || null,
       images: images,
       featured: b.featured || false,
       stock: Number(b.stock) || 0,
       tags: b.tags || [],
       is_active: b.isActive !== false,
-      fig_type: b.figType || "a",
-      bg_gradient: b.bgGradient || "#f5f5f5",
-      fig_color_a: b.figColorA || "#cccccc",
-      fig_color_b: b.figColorB || "#aaaaaa",
+      fig_type: b.figType || 'a',
+      bg_gradient: b.bgGradient || '#f5f5f5',
+      fig_color_a: b.figColorA || '#cccccc',
+      fig_color_b: b.figColorB || '#aaaaaa',
     };
 
-    const r = await fetch(base, { method: "POST", headers: h, body: JSON.stringify(payload) });
+    const r = await fetch(base, { method: 'POST', headers: h, body: JSON.stringify(payload) });
     const data = await r.json();
     if (!r.ok) return res.status(r.status).json({ error: JSON.stringify(data) });
     const row = Array.isArray(data) ? data[0] : data;
     return res.status(201).json(normalize(row));
   }
 
-  // ── PUT / PATCH (update) ─────────────────────────────────────────────────
-  if ((req.method === "PUT" || req.method === "PATCH") && isAdmin && id) {
+  // ── PUT / PATCH (update) ───────────────────────────────────────────────────
+  if ((req.method === 'PUT' || req.method === 'PATCH') && isAdmin && id) {
     const b = parseBody(req.body);
     const patch = {};
     if (b.name !== undefined) patch.name = b.name;
@@ -194,22 +193,22 @@ module.exports = async function handler(req, res) {
     if (b.figColorA !== undefined) patch.fig_color_a = b.figColorA;
     if (b.figColorB !== undefined) patch.fig_color_b = b.figColorB;
 
-    const r = await fetch(base + "?id=eq." + id, { method: "PATCH", headers: h, body: JSON.stringify(patch) });
+    const r = await fetch(base + '?id=eq.' + id, { method: 'PATCH', headers: h, body: JSON.stringify(patch) });
     const data = await r.json();
     if (!r.ok) return res.status(r.status).json({ error: JSON.stringify(data) });
     const row = Array.isArray(data) ? data[0] : data;
     return res.status(200).json(normalize(row));
   }
 
-  // ── DELETE ───────────────────────────────────────────────────────────────
-  if (req.method === "DELETE" && isAdmin && id) {
-    const r = await fetch(base + "?id=eq." + id, {
-      method: "DELETE",
-      headers: Object.assign({}, h, { Prefer: "" }),
+  // ── DELETE ─────────────────────────────────────────────────────────────────
+  if (req.method === 'DELETE' && isAdmin && id) {
+    const r = await fetch(base + '?id=eq.' + id, {
+      method: 'DELETE',
+      headers: Object.assign({}, h, { Prefer: '' }),
     });
     if (!r.ok) return res.status(r.status).json({ error: await r.text() });
     return res.status(200).json({ success: true });
   }
 
-  return res.status(405).json({ error: "Method not allowed" });
-};
+  return res.status(405).json({ error: 'Method not allowed' });
+}
