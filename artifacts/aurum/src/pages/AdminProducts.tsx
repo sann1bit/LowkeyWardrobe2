@@ -57,39 +57,25 @@ const DEFAULT_FORM = {
 
 type FormState = typeof DEFAULT_FORM;
 
-async function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(',')[1]);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 async function uploadImageToSupabase(file: File, onProgress?: (pct: number) => void): Promise<string> {
   const token = getAdminToken();
-  onProgress?.(10);
-  const base64 = await fileToBase64(file);
-  onProgress?.(40);
+  onProgress?.(20);
   const res = await fetch(apiUrl('/api/storage/uploads/file'), {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': file.type || 'image/jpeg',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify({ data: base64, type: file.type }),
+    body: file,
   });
   onProgress?.(90);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Upload failed (${res.status}): ${text}`);
   }
-  const { publicUrl } = await res.json() as { publicUrl: string };
+  const json = await res.json() as { publicUrl?: string; url?: string };
   onProgress?.(100);
-  return publicUrl;
+  return (json.publicUrl || json.url) as string;
 }
 
 export default function AdminProducts() {
