@@ -17,9 +17,22 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
     const token = localStorage.getItem('aurum_admin_token');
     if (!token) {
       setLocation('/admin/login');
-    } else {
-      setAuthChecked(true);
+      return;
     }
+    fetch(apiUrl('/api/admin/stats'), {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    })
+      .then(res => {
+        if (res.status === 401) {
+          localStorage.removeItem('aurum_admin_token');
+          setLocation('/admin/login');
+        } else {
+          setAuthChecked(true);
+        }
+      })
+      .catch(() => {
+        setAuthChecked(true);
+      });
   }, [setLocation]);
 
   if (!authChecked) {

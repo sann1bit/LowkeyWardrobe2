@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'wouter';
 import { AdminLayout, adminFetch } from '../components/AdminLayout';
 import { Save, RefreshCw, ChevronUp, ChevronDown } from 'lucide-react';
 
@@ -56,10 +57,12 @@ const TEXT_GROUPS = [
 const DEFAULT_ORDER = ['marquee','categories','sale_banner','new_arrivals','editorial','brands','features','newsletter'];
 
 export default function AdminSettings() {
+  const [, setLocation] = useLocation();
   const [settings, setSettings] = useState<Record<string, Setting>>({});
   const [edited, setEdited] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
+  const [saveError, setSaveError] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   // Section order state
@@ -92,6 +95,7 @@ export default function AdminSettings() {
   const handleSave = async (key: string) => {
     const value = getValue(key);
     setSaving(s => ({ ...s, [key]: true }));
+    setSaveError(s => { const n = { ...s }; delete n[key]; return n; });
     try {
       const res = await adminFetch(`/api/admin/settings/${key}`, {
         method: 'PUT',
@@ -105,9 +109,17 @@ export default function AdminSettings() {
         setEdited(prev => { const n = { ...prev }; delete n[key]; return n; });
         setSaved(s => ({ ...s, [key]: true }));
         setTimeout(() => setSaved(s => ({ ...s, [key]: false })), 2000);
+      } else if (res.status === 401) {
+        localStorage.removeItem('aurum_admin_token');
+        setLocation('/admin/login');
+      } else {
+        setSaveError(s => ({ ...s, [key]: 'Save failed — try again' }));
+        setTimeout(() => setSaveError(s => { const n = { ...s }; delete n[key]; return n; }), 3000);
       }
     } catch (e) {
       console.error(e);
+      setSaveError(s => ({ ...s, [key]: 'Network error' }));
+      setTimeout(() => setSaveError(s => { const n = { ...s }; delete n[key]; return n; }), 3000);
     } finally {
       setSaving(s => ({ ...s, [key]: false }));
     }
@@ -132,6 +144,9 @@ export default function AdminSettings() {
         }));
         setSaved(s => ({ ...s, [key]: true }));
         setTimeout(() => setSaved(s => ({ ...s, [key]: false })), 1500);
+      } else if (res.status === 401) {
+        localStorage.removeItem('aurum_admin_token');
+        setLocation('/admin/login');
       }
     } catch (e) { console.error(e); }
     finally { setSaving(s => ({ ...s, [key]: false })); }
@@ -161,6 +176,9 @@ export default function AdminSettings() {
         }));
         setOrderSaved(true);
         setTimeout(() => setOrderSaved(false), 2000);
+      } else if (res.status === 401) {
+        localStorage.removeItem('aurum_admin_token');
+        setLocation('/admin/login');
       }
     } catch (e) { console.error(e); }
     finally { setOrderSaving(false); }
@@ -211,19 +229,24 @@ export default function AdminSettings() {
                             className="flex-1 border border-[#EAEAEA] px-4 py-2.5 text-[13px] outline-none focus:border-black transition-colors font-light"
                           />
                         )}
-                        <button
-                          onClick={() => handleSave(key)}
-                          disabled={!dirty || isSaving}
-                          className={`shrink-0 flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-[0.1em] transition-colors ${
-                            isSaved ? 'bg-green-600 text-white'
-                              : dirty ? 'bg-black text-white hover:bg-[#333]'
-                              : 'bg-[#F5F5F5] text-[#BDBDBD] cursor-not-allowed'
-                          }`}
-                        >
-                          {isSaving ? <RefreshCw size={13} className="animate-spin" />
-                            : isSaved ? <span>Saved ✓</span>
-                            : <><Save size={13} /><span>Save</span></>}
-                        </button>
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <button
+                            onClick={() => handleSave(key)}
+                            disabled={!dirty || isSaving}
+                            className={`flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-[0.1em] transition-colors ${
+                              isSaved ? 'bg-green-600 text-white'
+                                : dirty ? 'bg-black text-white hover:bg-[#333]'
+                                : 'bg-[#F5F5F5] text-[#BDBDBD] cursor-not-allowed'
+                            }`}
+                          >
+                            {isSaving ? <RefreshCw size={13} className="animate-spin" />
+                              : isSaved ? <span>Saved ✓</span>
+                              : <><Save size={13} /><span>Save</span></>}
+                          </button>
+                          {saveError[key] && (
+                            <span className="text-[10px] text-red-500">{saveError[key]}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

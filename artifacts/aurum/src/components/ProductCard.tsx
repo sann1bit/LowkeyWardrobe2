@@ -20,6 +20,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isWishlisted = isInWishlist(product.id);
   const [activeColor, setActiveColor] = useState(product.colors[0]);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,24 +49,34 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.slug}`}>
       <div className="group cursor-pointer block h-full flex flex-col relative" data-testid={`product-card-${product.id}`}>
         <div className="relative aspect-[3/4] overflow-hidden bg-[#F0F0F0] w-full">
-          {primaryImage ? (
+          {primaryImage && !imgError ? (
             <>
               {!imgLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
               <img
                 src={primaryImage}
                 alt={product.name}
                 onLoad={() => setImgLoaded(true)}
+                onError={() => { setImgError(true); setImgLoaded(true); }}
                 className="w-full h-full object-cover group-hover:scale-[1.03] transition-all duration-700 ease-out"
                 style={{ opacity: imgLoaded ? 1 : 0, transition: 'opacity 400ms ease-out, transform 700ms ease-out' }}
               />
             </>
-          ) : (
+          ) : product.figType ? (
             <>
-              <div className="absolute inset-0" style={{ background: product.bgGradient }} />
+              <div className="absolute inset-0" style={{ background: product.bgGradient || 'linear-gradient(135deg, #1a1a1a, #2d2d2d)' }} />
               <motion.div className="absolute inset-0 w-full h-full" whileHover={{ scale: 1.06 }} transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}>
-                <FigureSVG figType={product.figType} ca={product.figColorA} cb={product.figColorB} className="w-full h-full" />
+                <FigureSVG figType={product.figType} ca={product.figColorA || '#c0c0c0'} cb={product.figColorB || '#ffffff'} className="w-full h-full" />
               </motion.div>
             </>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#F0F0F0] gap-3">
+              <div className="w-16 h-16 rounded-full bg-[#E0E0E0] flex items-center justify-center">
+                <span className="font-serif text-[22px] italic text-[#999]">
+                  {product.name?.charAt(0) || '?'}
+                </span>
+              </div>
+              <p className="text-[10px] uppercase tracking-[0.15em] text-[#BBBBBB] text-center px-4 line-clamp-2">{product.name}</p>
+            </div>
           )}
 
           {/* Badges */}
