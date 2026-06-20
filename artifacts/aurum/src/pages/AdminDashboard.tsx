@@ -35,7 +35,7 @@ export default function AdminDashboard() {
     { label: 'Total Products', value: stats?.products ?? '—', icon: Package, color: 'text-black' },
     { label: 'Newsletter Subscribers', value: stats?.subscribers ?? '—', icon: Mail, color: 'text-black' },
     { label: 'Total Orders', value: stats?.orders ?? '—', icon: ShoppingBag, color: 'text-black' },
-    { label: 'Total Revenue', value: stats ? `PKR ${stats.revenue.toLocaleString()}` : '—', icon: DollarSign, color: 'text-black' },
+    { label: 'Total Revenue', value: stats ? `PKR ${(stats.revenue ?? 0).toLocaleString()}` : '—', icon: DollarSign, color: 'text-black' },
   ];
 
   return (
