@@ -63,6 +63,7 @@ export default function AdminSettings() {
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
   const [saveError, setSaveError] = useState<Record<string, string>>({});
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Section order state
@@ -110,8 +111,7 @@ export default function AdminSettings() {
         setSaved(s => ({ ...s, [key]: true }));
         setTimeout(() => setSaved(s => ({ ...s, [key]: false })), 2000);
       } else if (res.status === 401) {
-        localStorage.removeItem('aurum_admin_token');
-        setLocation('/admin/login');
+        setSessionExpired(true);
       } else {
         setSaveError(s => ({ ...s, [key]: 'Save failed — try again' }));
         setTimeout(() => setSaveError(s => { const n = { ...s }; delete n[key]; return n; }), 3000);
@@ -145,8 +145,7 @@ export default function AdminSettings() {
         setSaved(s => ({ ...s, [key]: true }));
         setTimeout(() => setSaved(s => ({ ...s, [key]: false })), 1500);
       } else if (res.status === 401) {
-        localStorage.removeItem('aurum_admin_token');
-        setLocation('/admin/login');
+        setSessionExpired(true);
       }
     } catch (e) { console.error(e); }
     finally { setSaving(s => ({ ...s, [key]: false })); }
@@ -177,15 +176,32 @@ export default function AdminSettings() {
         setOrderSaved(true);
         setTimeout(() => setOrderSaved(false), 2000);
       } else if (res.status === 401) {
-        localStorage.removeItem('aurum_admin_token');
-        setLocation('/admin/login');
+        setSessionExpired(true);
       }
     } catch (e) { console.error(e); }
     finally { setOrderSaving(false); }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('aurum_admin_token');
+    setLocation('/admin/login');
+  };
+
   return (
     <AdminLayout title="Site Settings">
+      {sessionExpired && (
+        <div className="mb-6 flex items-center justify-between gap-4 border border-red-200 bg-red-50 px-5 py-4">
+          <p className="text-[13px] text-red-700">
+            Your session has expired or is invalid. Please sign in again to save changes.
+          </p>
+          <button
+            onClick={handleLogout}
+            className="shrink-0 bg-red-600 text-white text-[11px] uppercase tracking-[0.1em] px-4 py-2 hover:bg-red-700 transition-colors"
+          >
+            Sign In Again
+          </button>
+        </div>
+      )}
       {loading ? (
         <div className="flex items-center justify-center py-24">
           <span className="spinner spinner--lg" style={{ color: '#111' }} />
