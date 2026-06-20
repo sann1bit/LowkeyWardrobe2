@@ -100,14 +100,19 @@ export default async function handler(req, res) {
   // ID comes from query param (set by Vercel rewrite) OR URL path
   const q = req.query || {};
   const idFromQuery = q.id;
-  const idFromPath = (req.url || '').match(/\/products\/(\d+)/)?.[1];
-  const id = idFromQuery || idFromPath || null;
+  const idFromPath = (req.url || '').match(/\/products\/([^?]+)/)?.[1];
+  const rawId = idFromQuery || idFromPath || null;
+  // Determine if it's a numeric ID or a slug
+  const isNumericId = rawId && /^\d+$/.test(rawId);
+  const id = isNumericId ? rawId : null;
+  const slug = !isNumericId ? rawId : null;
 
   // ── GET ────────────────────────────────────────────────────────────────────
   if (req.method === 'GET') {
-    if (id) {
-      // Single product by ID
-      const r = await fetch(base + '?id=eq.' + id + '&limit=1', {
+    if (id || slug) {
+      // Single product by ID or slug
+      const filter = id ? '?id=eq.' + id + '&limit=1' : '?slug=eq.' + encodeURIComponent(slug) + '&limit=1';
+      const r = await fetch(base + filter, {
         headers: Object.assign({}, h, { Prefer: '' }),
       });
       if (!r.ok) return res.status(r.status).json({ error: await r.text() });
