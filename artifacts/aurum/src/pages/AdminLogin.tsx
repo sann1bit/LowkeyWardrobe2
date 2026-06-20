@@ -23,12 +23,22 @@ export default function AdminLogin() {
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem('aurum_admin_token', data.token);
-        setLocation('/admin');
-      } else {
+      if (!res.ok) {
         setError(data.error || 'Invalid credentials');
+        return;
       }
+      const token = data.token as string;
+      // Verify the token actually works against a protected endpoint
+      // before storing it — catches SESSION_SECRET mismatches early.
+      const verify = await fetch(apiUrl('/api/admin/stats'), {
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      });
+      if (!verify.ok) {
+        setError('Server authentication error — the API server SESSION_SECRET may not match. Please set SESSION_SECRET on your API deployment and try again.');
+        return;
+      }
+      localStorage.setItem('aurum_admin_token', token);
+      setLocation('/admin');
     } catch {
       setError('Connection error. Please try again.');
     } finally {
