@@ -35,7 +35,7 @@ function verifyJwt(req) {
   const parts = token.split('.');
   if (parts.length !== 3) return false;
   try {
-    const secret = process.env.SESSION_SECRET || '';
+    const secret = process.env.SESSION_SECRET || 'aurum-secret-key';
     const sig = createHmac('sha256', secret)
       .update(parts[0] + '.' + parts[1])
       .digest('base64')
