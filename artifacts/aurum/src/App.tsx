@@ -23,6 +23,7 @@ import { SearchOverlay } from "./components/SearchOverlay";
 import { Toast } from "./components/Toast";
 import { PageLoader } from "./components/PageLoader";
 import { RouteProgress } from "./components/RouteProgress";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { ChatWidget } from "./components/ChatWidget";
 
 const queryClient = new QueryClient();
@@ -92,6 +93,7 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <ScrollToTop />
           <PageLoader />
           <RouteProgress />
           {adminRoute ? (

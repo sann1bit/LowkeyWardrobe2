@@ -5,7 +5,7 @@ import { ProductCard } from '../components/ProductCard';
 import { ProductCardSkeleton } from '../components/ProductCardSkeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, ChevronDown, Search, X } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { useLocation, useSearch } from 'wouter';
 
 const SUBCATEGORIES: Record<string, { id: string; label: string }[]> = {
   clothing: [
@@ -29,7 +29,7 @@ const SUBCATEGORIES: Record<string, { id: string; label: string }[]> = {
 };
 
 export default function Products() {
-  const [location] = useLocation();
+  const search = useSearch();   // updates on every navigation, including same-pathname query changes
   const [activeCategory, setActiveCategory] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('category') || 'all';
@@ -43,14 +43,15 @@ export default function Products() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync category from URL whenever the location (including query string) changes.
-  // This handles navigation from Navbar/Footer links while Products is already mounted.
+  // Sync category whenever the URL query string changes — covers both cross-route
+  // navigation (ProductDetail → Products) and same-pathname category switching
+  // (Products?shoes → Products?clothing) via Navbar/Footer links.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(search);
     const cat = params.get('category') || 'all';
     setActiveCategory(cat);
     setActiveSubcategory('all');
-  }, [location]);
+  }, [search]);
 
   useEffect(() => {
     setActiveSubcategory('all');
