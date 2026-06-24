@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -87,9 +86,14 @@
   --destructive-foreground: 0 0% 100%;
   --destructive-border: 0 84% 60%;
 
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: 'Cormorant Garamond', serif;
+  --app-font-sans: 'Raleway', 'Helvetica Neue', sans-serif;
+  --app-font-serif: 'Cormorant Garamond', 'Georgia', serif;
   --app-font-mono: Menlo, monospace;
+
+  --font-display-italic: 'Cormorant Garamond', 'Georgia', serif;
+  --font-display-upright: 'Tenor Sans', 'Georgia', serif;
+  --font-smallcaps: 'Cormorant SC', 'Georgia', serif;
+  --font-body: 'Raleway', 'Helvetica Neue', sans-serif;
 }
 
 .dark {
@@ -147,6 +151,16 @@
 
 .animate-marquee {
   animation: marquee 20s linear infinite;
+}
+
+@keyframes scroll-indicator {
+  0% { transform: translateY(-100%); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.animate-scroll-indicator {
+  animation: scroll-indicator 2s ease-in-out infinite;
 }
 
 /* ── Loading System Design Tokens ─────────────────────────── */

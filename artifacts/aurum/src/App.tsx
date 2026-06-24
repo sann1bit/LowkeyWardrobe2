@@ -14,6 +14,7 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminNewsletter from "./pages/AdminNewsletter";
 import AdminOrders from "./pages/AdminOrders";
 import AdminSettings from "./pages/AdminSettings";
+import TrackOrder from "./pages/TrackOrder";
 
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -68,6 +69,7 @@ function Router() {
       <Route path="/cart" component={Cart} />
       <Route path="/wishlist" component={Wishlist} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/track-order" component={TrackOrder} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/newsletter" component={AdminNewsletter} />
