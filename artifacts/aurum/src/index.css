@@ -90,10 +90,10 @@
   --app-font-serif: 'Cormorant Garamond', 'Georgia', serif;
   --app-font-mono: Menlo, monospace;
 
-  --font-display-italic: 'Cormorant Garamond', 'Georgia', serif;
-  --font-display-upright: 'Tenor Sans', 'Georgia', serif;
-  --font-smallcaps: 'Cormorant SC', 'Georgia', serif;
-  --font-body: 'Raleway', 'Helvetica Neue', sans-serif;
+  --font-display-italic: 'Cormorant Garamond', Georgia, serif;
+  --font-display-upright: 'Cormorant Garamond', Georgia, serif;
+  --font-smallcaps: 'Cormorant SC', Georgia, serif;
+  --font-body: 'Raleway', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .dark {

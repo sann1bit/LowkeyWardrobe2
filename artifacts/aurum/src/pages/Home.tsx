@@ -117,7 +117,7 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const saleEndDate = new Date('2026-08-01T00:00:00');
+  const saleEndDate = new Date(s.sale_end_date || '2026-08-01T00:00:00');
   const countdown = useCountdown(saleEndDate);
 
   const sectionOrder: string[] = (() => {
@@ -411,10 +411,10 @@ export default function Home() {
                 {slides[currentSlide].eyebrow}
               </p>
               <h1 className="leading-none mb-10">
-                <span style={{ fontFamily: 'var(--font-display-italic)', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(52px,7.5vw,110px)', lineHeight: 0.95, letterSpacing: '-0.01em', color: '#FFFFFF', display: 'block', marginBottom: '4px' }}>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(50px,7.5vw,108px)', lineHeight: 0.95, letterSpacing: '-0.01em', color: '#FFFFFF', display: 'block', marginBottom: '4px' }}>
                   {slides[currentSlide].line1}
                 </span>
-                <span style={{ fontFamily: 'var(--font-display-upright)', fontStyle: 'normal', fontWeight: 400, fontSize: 'clamp(54px,7.8vw,115px)', lineHeight: 1.0, letterSpacing: '0.01em', color: '#FFFFFF', display: 'block' }}>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'normal', fontWeight: 500, fontSize: 'clamp(52px,7.8vw,112px)', lineHeight: 1.0, letterSpacing: '0.01em', color: '#FFFFFF', display: 'block' }}>
                   {slides[currentSlide].line2}
                 </span>
               </h1>

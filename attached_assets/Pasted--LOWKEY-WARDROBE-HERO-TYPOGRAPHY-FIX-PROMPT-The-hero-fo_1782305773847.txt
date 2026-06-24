@@ -1,0 +1,152 @@
+# LOWKEY WARDROBE — HERO TYPOGRAPHY FIX PROMPT
+# The hero font looks broken. Fix ONLY the typography. Do not touch anything else.
+
+---
+
+## THE PROBLEM
+
+The upright bold line in the hero (e.g. "Be Remembered", "We Make it Real", "Pure Class.")
+is rendering in a heavy system fallback font because Tenor Sans is not loading reliably
+in this environment. Fix this completely using the approach below.
+
+---
+
+## STEP 1 — REPLACE THE GOOGLE FONTS IMPORT ENTIRELY
+
+Remove whatever font import currently exists in the global head and replace it with
+this exact import. Use font-display=swap for reliability:
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Cormorant+SC:wght@300;400;500;600&family=Raleway:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
+
+NOTE: Tenor Sans has been removed. We are now using Cormorant Garamond for BOTH display
+lines in the hero. This is actually how top luxury brands do it — one elegant serif family,
+italic vs upright contrast within the same typeface. It is more refined and guaranteed
+to load since Cormorant Garamond is one of the most popular Google Fonts.
+
+---
+
+## STEP 2 — UPDATE CSS VARIABLES
+
+In globals.css or equivalent, update the root variables:
+
+:root {
+  --font-display-italic: 'Cormorant Garamond', Georgia, serif;
+  --font-display-upright: 'Cormorant Garamond', Georgia, serif;
+  --font-smallcaps: 'Cormorant SC', Georgia, serif;
+  --font-body: 'Raleway', 'Helvetica Neue', Arial, sans-serif;
+}
+
+---
+
+## STEP 3 — DIRECTLY TARGET HERO TEXT ELEMENTS WITH EXPLICIT CSS
+
+This is the most important step. Do not rely only on CSS variables — directly target
+the hero text classes/elements with hardcoded font properties.
+
+Find the hero section component and apply these styles directly to each text layer.
+Use whichever selector matches the actual class names in the code:
+
+/* === HERO — TOP LABEL (e.g. "SS26 COLLECTION", "NEW ARRIVALS", "HERITAGE") === */
+.hero-label,
+[class*="hero"] [class*="label"],
+[class*="hero"] [class*="subtitle"],
+[class*="slide"] [class*="label"] {
+  font-family: 'Cormorant SC', Georgia, serif !important;
+  font-size: clamp(10px, 1.2vw, 13px) !important;
+  font-weight: 500 !important;
+  font-style: normal !important;
+  letter-spacing: 0.28em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* === HERO — ITALIC LINE (e.g. "Be Seen", "Luxury is a Feeling", "Less Noise") === */
+.hero-title-italic,
+[class*="hero"] [class*="italic"],
+[class*="slide"] [class*="italic"],
+[class*="hero"] h1 em,
+[class*="hero"] h2 em {
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+  font-style: italic !important;
+  font-weight: 300 !important;
+  font-size: clamp(50px, 7.5vw, 108px) !important;
+  line-height: 0.95 !important;
+  letter-spacing: -0.01em !important;
+  color: #FFFFFF !important;
+  display: block !important;
+}
+
+/* === HERO — UPRIGHT LINE (e.g. "Be Remembered", "We Make it Real", "Pure Class.") === */
+.hero-title-upright,
+[class*="hero"] [class*="title"]:not([class*="italic"]),
+[class*="slide"] [class*="title"]:not([class*="italic"]),
+[class*="hero"] h1:not(em),
+[class*="hero"] h2:not(em) {
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: clamp(52px, 7.8vw, 112px) !important;
+  line-height: 1.0 !important;
+  letter-spacing: 0.01em !important;
+  color: #FFFFFF !important;
+  display: block !important;
+}
+
+---
+
+## STEP 4 — IF INLINE STYLES ARE BEING USED IN THE COMPONENT
+
+If the hero text is styled with inline style props in JSX/TSX (e.g. style={{ fontFamily: ... }}),
+update those inline styles directly in the hero component file:
+
+For the italic line element:
+  style={{
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontStyle: "italic",
+    fontWeight: 300,
+    fontSize: "clamp(50px, 7.5vw, 108px)",
+    lineHeight: 0.95,
+    letterSpacing: "-0.01em",
+    color: "#FFFFFF",
+    display: "block"
+  }}
+
+For the upright line element:
+  style={{
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontStyle: "normal",
+    fontWeight: 500,
+    fontSize: "clamp(52px, 7.8vw, 112px)",
+    lineHeight: 1.0,
+    letterSpacing: "0.01em",
+    color: "#FFFFFF",
+    display: "block"
+  }}
+
+---
+
+## STEP 5 — UPDATE ALL OTHER DISPLAY HEADINGS TO MATCH
+
+Anywhere else on the site that previously used Tenor Sans (--font-display-upright),
+update those elements to use Cormorant Garamond weight 400 or 500 instead.
+The variable is already updated in Step 2 so this should propagate automatically,
+but verify any inline styles or Tailwind classes that hardcoded Tenor Sans.
+
+---
+
+## WHAT THE RESULT SHOULD LOOK LIKE
+
+After this fix, the hero will have:
+- Top label: "SS26 COLLECTION" — Cormorant SC, small caps, wide letter-spacing, muted white
+- Italic line: "Be Seen" — Cormorant Garamond Italic weight 300, feather-thin and elegant
+- Upright line: "Be Remembered" — Cormorant Garamond Regular weight 500, authoritative
+  but still refined — NOT heavy, NOT chunky, NOT bold
+
+The contrast between the two lines comes from italic vs upright within the same
+beautiful typeface family. This is the approach used by The Row, Bottega Veneta,
+Loro Piana and similar ultra-luxury fashion houses in their digital presence.
+
+---
+END OF FIX PROMPT

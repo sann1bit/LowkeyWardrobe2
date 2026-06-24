@@ -23,10 +23,12 @@ const SECTION_LABELS: Record<string, string> = {
 
 const FIXED_SECTIONS = new Set(['categories', 'newsletter']); // always shown, not togglable
 
+const DATETIME_KEYS = new Set(['sale_end_date']);
+
 const TEXT_GROUPS = [
   {
     title: 'Sale Banner',
-    keys: ['sale_banner_text'],
+    keys: ['sale_banner_text', 'sale_end_date'],
   },
   {
     title: 'Hero Slide 1',
@@ -226,11 +228,28 @@ export default function AdminSettings() {
                   const isSaving = saving[key];
                   const isSaved = saved[key];
                   const isLong = key === 'marquee_text' || key === 'newsletter_tagline';
+                  const isDatetime = DATETIME_KEYS.has(key);
+                  // datetime-local needs value in "YYYY-MM-DDTHH:MM" format
+                  const dtValue = isDatetime && value
+                    ? value.slice(0, 16)
+                    : value;
                   return (
                     <div key={key} className="px-6 py-5">
-                      <label className="block text-[10px] uppercase tracking-[0.15em] text-[#999999] mb-2">{label}</label>
+                      <label className="block text-[10px] uppercase tracking-[0.15em] text-[#999999] mb-2">
+                        {label || (key === 'sale_end_date' ? 'Sale Countdown End Date & Time' : key)}
+                      </label>
+                      {isDatetime && (
+                        <p className="text-[11px] text-[#AAAAAA] mb-2">Set the date and time when the sale countdown reaches zero. Changes take effect immediately.</p>
+                      )}
                       <div className="flex gap-3 items-start">
-                        {isLong ? (
+                        {isDatetime ? (
+                          <input
+                            type="datetime-local"
+                            value={dtValue}
+                            onChange={e => setEdited(prev => ({ ...prev, [key]: e.target.value + ':00' }))}
+                            className="flex-1 border border-[#EAEAEA] px-4 py-2.5 text-[13px] outline-none focus:border-black transition-colors font-light"
+                          />
+                        ) : isLong ? (
                           <textarea
                             value={value}
                             onChange={e => setEdited(prev => ({ ...prev, [key]: e.target.value }))}
