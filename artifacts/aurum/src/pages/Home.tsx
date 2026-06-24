@@ -3,7 +3,7 @@ import { useListProducts, useSubscribeNewsletter } from '@workspace/api-client-r
 import { products as hardcodedProducts } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import { useUIStore } from '../stores/uiStore';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 
 const DEFAULT_ORDER = ['marquee','categories','sale_banner','new_arrivals','editorial','brands','features','newsletter'];
@@ -49,12 +49,12 @@ function GiftIcon() {
   );
 }
 
-function useCountdown(targetDate: Date) {
+function useCountdown(targetTs: number) {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   useEffect(() => {
     const calc = () => {
-      const diff = targetDate.getTime() - Date.now();
-      if (diff <= 0) return;
+      const diff = targetTs - Date.now();
+      if (diff <= 0) { setTime({ days: 0, hours: 0, minutes: 0, seconds: 0 }); return; }
       setTime({
         days: Math.floor(diff / 86400000),
         hours: Math.floor((diff % 86400000) / 3600000),
@@ -65,7 +65,7 @@ function useCountdown(targetDate: Date) {
     calc();
     const id = setInterval(calc, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [targetTs]);
   return time;
 }
 
@@ -117,8 +117,11 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const saleEndDate = new Date(s.sale_end_date || '2026-08-01T00:00:00');
-  const countdown = useCountdown(saleEndDate);
+  const saleEndTs = useMemo(
+    () => new Date(s.sale_end_date || '2026-08-01T00:00:00').getTime(),
+    [s.sale_end_date]
+  );
+  const countdown = useCountdown(saleEndTs);
 
   const sectionOrder: string[] = (() => {
     try { const arr = JSON.parse(s.home_section_order || '[]'); return Array.isArray(arr) && arr.length > 0 ? arr : DEFAULT_ORDER; }
