@@ -1,0 +1,700 @@
+# LOWKEY WARDROBE — MASTER UPGRADE PROMPT (UI + TYPOGRAPHY)
+# Paste this entire prompt into Replit AI Agent
+
+---
+
+You are upgrading an existing luxury fashion e-commerce website called Lowkey Wardrobe.
+The entire website theme is strictly black and white only — monochromatic, premium, minimal,
+elegant, and professional. Every new addition must follow this exact same design language.
+Do NOT introduce any colors. Typography uses serif italic for display headings and clean
+sans-serif for body text. Everything must feel like a high-end editorial fashion house.
+
+Work through every section below systematically, one at a time.
+
+---
+
+## ═══════════════════════════════════════
+## SECTION A — TYPOGRAPHY SYSTEM (DO THIS FIRST)
+## ═══════════════════════════════════════
+
+---
+
+### A.1 — IMPORT FONTS IN THE GLOBAL HEAD
+
+In the <head> of the app (in your _document.js, layout.tsx, index.html, or wherever
+global head tags are placed), replace any existing font imports with this:
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Cormorant+SC:wght@300;400;500;600&family=Tenor+Sans&family=Raleway:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
+
+---
+
+### A.2 — SET GLOBAL CSS FONT VARIABLES
+
+In your global CSS file (globals.css, styles.css, or equivalent), add at :root level:
+
+:root {
+  --font-display-italic: 'Cormorant Garamond', 'Georgia', serif;
+  --font-display-upright: 'Tenor Sans', 'Georgia', serif;
+  --font-smallcaps: 'Cormorant SC', 'Georgia', serif;
+  --font-body: 'Raleway', 'Helvetica Neue', sans-serif;
+}
+
+---
+
+### A.3 — HERO SLIDESHOW TYPOGRAPHY
+
+Each slide has three text layers. Apply these exact styles:
+
+LAYER 1 — Top label (e.g. "SS26 COLLECTION", "NEW ARRIVALS", "HERITAGE"):
+  font-family: var(--font-smallcaps);
+  font-size: clamp(10px, 1.2vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 12px;
+
+LAYER 2 — Italic line (e.g. "Be Seen", "Luxury is a Feeling", "Less Noise"):
+  font-family: var(--font-display-italic);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(52px, 7.5vw, 110px);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+
+LAYER 3 — Bold upright line (e.g. "Be Remembered", "We Make it Real", "Pure Class."):
+  font-family: var(--font-display-upright);
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(54px, 7.8vw, 115px);
+  line-height: 1.0;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+  margin-bottom: 40px;
+
+SIZING NOTE: The italic line (Layer 2) and the upright line (Layer 3) must be very close
+in font-size — within 2–4px of each other — so they sit as one unified visual block.
+The contrast comes from font style (italic thin vs upright), NOT from size difference.
+
+---
+
+### A.4 — NAVBAR TYPOGRAPHY
+
+Logo ("LOWKEY WARDROBE"):
+  font-family: var(--font-smallcaps);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #000000;
+
+Nav links (NEW ARRIVALS, CLOTHING, SHOES, ACCESSORIES, SALE):
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #000000;
+
+---
+
+### A.5 — SECTION HEADINGS ACROSS THE SITE
+
+Large section headings (e.g. "New Arrivals", "The Inner Circle"):
+  font-family: var(--font-display-italic);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(36px, 4vw, 64px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #000000;
+
+Category card titles on dark backgrounds (e.g. "Clothing", "Shoes", "Accessories"):
+  font-family: var(--font-display-italic);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(36px, 4vw, 56px);
+  color: #FFFFFF;
+
+Sub-labels on category cards (e.g. "MENSWEAR · WOMENSWEAR · UNISEX"):
+  font-family: var(--font-smallcaps);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.65);
+
+CTA links on category cards (e.g. "EXPLORE COLLECTION →", "STEP FORWARD →"):
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+---
+
+### A.6 — PRODUCT CARDS TYPOGRAPHY
+
+Brand label above product name (e.g. "LKW ESSENTIALS", "LKW SPORT"):
+  font-family: var(--font-smallcaps);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: rgba(0, 0, 0, 0.45);
+
+Product name:
+  font-family: var(--font-display-italic);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.3;
+  color: #000000;
+
+Product price:
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: #000000;
+
+Gender tag (e.g. "UNISEX", "MEN"):
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.45);
+
+---
+
+### A.7 — BUTTONS (ALL BUTTONS SITE-WIDE)
+
+Primary filled buttons (e.g. "ADD TO BAG", "SHOP COLLECTION"):
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+Secondary outlined buttons (e.g. "NEW ARRIVALS", "VIEW ALL PRODUCTS"):
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+---
+
+### A.8 — MARQUEE / ANNOUNCEMENT BAR
+
+The scrolling black banner text:
+  font-family: var(--font-smallcaps);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+
+---
+
+### A.9 — PRODUCT DETAIL PAGE TYPOGRAPHY
+
+Product name (large heading):
+  font-family: var(--font-display-italic);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(28px, 3.5vw, 48px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #000000;
+
+Price:
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+
+Section labels (e.g. "SIZE", "COLOR"):
+  font-family: var(--font-smallcaps);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: rgba(0, 0, 0, 0.5);
+
+Product description body text:
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+  color: rgba(0, 0, 0, 0.7);
+
+---
+
+### A.10 — FOOTER TYPOGRAPHY
+
+Section titles (e.g. "Quick Links", "Customer Care"):
+  font-family: var(--font-smallcaps);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+
+Footer links:
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 2.2;
+
+---
+
+### A.11 — SALE / PROMOTIONAL SECTION
+
+"upto 69% off" display text:
+  font-family: var(--font-display-italic);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(42px, 6vw, 88px);
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+
+"SALE SALE SALE" large background text:
+  font-family: var(--font-display-upright);
+  font-size: clamp(80px, 14vw, 200px);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.06);
+  letter-spacing: 0.05em;
+
+---
+
+### A.12 — GLOBAL TYPOGRAPHY RULES (apply everywhere)
+
+1. Wherever there is currently a bold or heavy font-weight (600, 700, 800) on headings,
+   change it to weight 300 or 400 using Cormorant Garamond instead.
+   Luxury typography achieves visual weight through SIZE, not font-weight.
+   Heavy font-weight looks cheap. Light weight + large size looks expensive.
+
+2. Remove any text-shadow or drop-shadow on all text. Flat, sharp, clean only.
+
+3. For overlay text on dark/image backgrounds, use pure #FFFFFF only.
+
+4. All small-caps labels ("SS26 COLLECTION", "HERITAGE", "MENSWEAR · WOMENSWEAR")
+   must use Cormorant SC — true small-caps look engraved and architectural.
+
+5. Line-height on all body text must be 1.85 minimum. White space is luxury.
+
+6. The dot separator in tags like "MENSWEAR · WOMENSWEAR · UNISEX" must use the
+   actual middle-dot character (·) not a period or hyphen.
+
+7. Large display text (above 48px) should have letter-spacing: -0.01em (slightly tight).
+   Small utility text (below 14px) should have letter-spacing: 0.15em or more (open).
+   This is the rule luxury brands follow: tight big, open small.
+
+---
+
+## ═══════════════════════════════════════
+## SECTION B — UI / UX ENHANCEMENTS
+## ═══════════════════════════════════════
+
+---
+
+### B.1 — HERO SECTION UPGRADES
+
+- The existing CTA buttons ("SHOP COLLECTION" and "NEW ARRIVALS") need a sweep-fill
+  hover animation: on hover, a white background sweeps in from the left side using a
+  ::before pseudo-element with transform: scaleX(). For the dark button ("NEW ARRIVALS"),
+  invert the sweep. Transition 300ms ease-in-out. Text color must invert on hover too.
+
+- Replace the existing circular slide dots at the bottom of the hero with thin horizontal
+  progress bar indicators — each slide gets a thin line (40px wide, 2px tall). Inactive
+  lines are white at 30% opacity. The active slide line is white at 100% opacity. Gap
+  between them is 8px. This looks editorial and premium vs round dots.
+
+- Add a scroll indicator at the very bottom center of the hero — a thin animated vertical
+  line (2px wide, 36px tall) that pulses up-and-down in a slow loop using CSS keyframes.
+  Color: white. This tells users there is more content below the fold.
+
+- DO NOT add any zoom or Ken Burns effect to the hero images. Keep images fully static
+  during their active slide. Only the cross-fade transition between slides is needed.
+
+---
+
+### B.2 — NAVIGATION UPGRADES
+
+- Make the header sticky with a backdrop blur effect when the user scrolls past the hero.
+  Once scrolled, the navbar background transitions from transparent to white with
+  backdrop-filter: blur(12px) and a subtle bottom border: 1px solid rgba(0,0,0,0.08).
+  Transition 300ms ease. When scrolled back to top it returns to transparent.
+
+- Add mega dropdown menus for Clothing, Shoes, and Accessories nav links. On hover, a
+  full-width dropdown panel appears below the nav with subcategories:
+    Clothing: Menswear / Womenswear / Unisex / New Arrivals / Sale
+    Shoes: Menswear / Womenswear / Unisex / Sneakers / Formal / Sale
+    Accessories: Watches / Wallets / Belts / Bags / Jewellery
+  Style: white background panel, black text, minimal layout, generous padding.
+  Font: Cormorant SC, 11px, letter-spacing 0.18em, uppercase. Smooth fade-in on hover.
+
+- Ensure the wishlist and cart nav icons show badge counters — a small filled black
+  circle with white number text positioned top-right of the icon. Hide the badge
+  when the count is zero.
+
+---
+
+### B.3 — CATEGORY CARDS HOVER UPGRADE
+
+- When the user hovers over any category card (Clothing, Shoes, Accessories), the
+  background image zooms in by 6% (transform: scale(1.06)), transition 500ms ease.
+  Simultaneously, a semi-transparent dark overlay (rgba(0,0,0,0.3)) fades in smoothly.
+  The zoom must be contained using overflow: hidden on the card container.
+
+- DO NOT show any "EXPLORE →" button or any text overlay appearing on hover.
+  The hover effect is purely visual — the subtle zoom + dark overlay only.
+  No text, no button, no label appears on hover.
+
+---
+
+### B.4 — PRODUCT CARDS UPGRADES
+
+- Add second-image-on-hover: each product card stores a secondary image URL. When the
+  user hovers the card image area, the primary image fades out and secondary fades in.
+  Transition 300ms ease. If no secondary image exists for a product, skip this effect
+  for that card only.
+
+- Add a Quick View button that appears on hover of each product card — a small
+  rectangular button centered at the bottom of the card image area that slides up from
+  below on hover (transform: translateY). Clicking it opens a modal overlay showing:
+  product image, product name, price, size selector, color swatches, and an ADD TO BAG
+  button — without leaving the current page. Modal has dark semi-transparent backdrop,
+  white content panel, close button top-right (×). Fully responsive.
+
+- Show an "Only X left" urgency label on product cards when stock quantity is 3 or fewer.
+  Style: small all-caps label, black background, white text, top of card alongside NEW badge.
+
+- Ensure color swatches on product cards are filled circles — 14px diameter, border 1px
+  solid rgba(0,0,0,0.2). Black fill for black, white fill with grey border for white,
+  grey fill for grey. Positioned in a row below the product name.
+
+---
+
+### B.5 — PRODUCT DETAIL PAGE UPGRADES
+
+- Add image zoom on hover: when user hovers the main product image, show a circular
+  magnifier lens (200px diameter) following the cursor. Inside the lens: 2.5× zoomed
+  version of the image at the cursor position. Use CSS + JavaScript mousemove events.
+
+- Add a sticky Add to Bag bar: when user scrolls past the original ADD TO BAG button,
+  a fixed bottom bar appears at the viewport bottom. It shows: product name, selected
+  size, price, and ADD TO BAG button. Black background, white text. Smooth slide-up
+  animation when appearing. Disappears when user scrolls back to the original button.
+
+- Size guide link opens a size guide modal (not a new page). The modal shows a
+  measurement table: Size / Chest CM / Waist CM / Hips CM / Chest inches / Waist inches
+  / Hips inches. Standard Pakistani sizing (S/M/L/XL/XXL for clothing, 39–45 for shoes).
+  Clean table, black header row, alternating light grey rows.
+
+- Add a "Complete the Look" section below the product description — a horizontal row of
+  3–4 complementary product cards. Heading: "Complete the Look" in serif italic.
+  Products auto-selected from a different category than the current product.
+
+- Add a "Recently Viewed" section at the bottom of the product page — horizontally
+  scrollable row of products visited in this session, stored in localStorage. Heading:
+  "Recently Viewed" in serif italic. Only show when at least 2 products have been viewed.
+
+- Add an "Order via WhatsApp" button directly below the ADD TO BAG button. Style: black
+  outlined button matching site theme (no green). On click, open WhatsApp with pre-filled
+  message: "Hi! I'd like to order: [Product Name], Size: [Selected Size], Color:
+  [Selected Color]. Price: PKR [Price]. Please confirm availability."
+  WhatsApp URL: https://wa.me/92XXXXXXXXXX?text=[encoded message]
+  Replace 92XXXXXXXXXX with the store's actual WhatsApp number.
+
+---
+
+### B.6 — SALE BANNER UPGRADE
+
+- Add an optional countdown timer to the sale banner section. Show four blocks:
+  DAYS / HOURS / MINUTES / SECONDS counting down to a configurable end date.
+  Style: large white numerals, minimal colon separators, small muted labels below.
+  The timer end date is set via a variable in the code (saleEndDate) for easy updates.
+
+---
+
+### B.7 — TRUST SIGNALS SECTION
+
+- Replace existing generic icons in the trust signals row with custom thin-line SVG icons:
+    Free Shipping → thin outline delivery truck or box icon
+    Authenticity Guaranteed → thin outline shield with inner checkmark
+    30-Day Returns → thin outline circular refresh/return arrow
+    Luxury Packaging → thin outline gift box with ribbon
+  All icons: 32×32px, 1.5px stroke weight, black stroke, no fill. Consistent style.
+
+---
+
+### B.8 — FOOTER UPGRADES
+
+- Add social media links: Instagram, Facebook, TikTok, Pinterest — small thin-line icons
+  in a row. Black color. Hover: opacity 0.6. No colored backgrounds or fills.
+
+- Add payment method icons row: JazzCash, Easypaisa, Visa, Mastercard — displayed as
+  greyscale/desaturated small logos in a horizontal row. Label: "SECURE PAYMENTS" above
+  in Cormorant SC, 10px, letter-spacing 0.2em.
+
+- Ensure footer has: Quick Links / Categories / Customer Care / Contact columns.
+  Clean, minimal, all black text.
+
+- Add a Back to Top button — fixed bottom-right corner, small black square button with
+  thin up-arrow icon. Only visible after user scrolls 300px down. Smooth scroll to top.
+
+---
+
+## ═══════════════════════════════════════
+## SECTION C — NEW FEATURES & FUNCTIONALITY
+## ═══════════════════════════════════════
+
+---
+
+### C.1 — CASH ON DELIVERY (COD) — CRITICAL FOR PAKISTAN
+
+- Add Cash on Delivery as a payment option at checkout.
+- Show it as a selectable option with a small cash icon at the payment step.
+- When COD selected, show note: "Our team will confirm your order via SMS/WhatsApp
+  before dispatch."
+- In admin dashboard Orders view, show a COD badge on COD orders.
+- Order confirmation page must state: "You selected Cash on Delivery. Payment is due
+  upon delivery."
+
+---
+
+### C.2 — JAZZCASH & EASYPAISA PAYMENT OPTIONS
+
+- Add JazzCash and Easypaisa as selectable payment options at checkout.
+- Show their logos greyscale/black-and-white to match the site theme.
+- For each: show a mobile number input and transaction ID field, with instructions.
+  This is a manual payment confirmation flow — customer submits their mobile number
+  and transaction ID, admin confirms manually.
+- In admin orders view: show which payment method was used per order.
+
+---
+
+### C.3 — WHATSAPP FLOATING CHAT BUTTON
+
+- Add a floating "Chat on WhatsApp" button at the bottom-right of every page.
+  Style: small black rounded button, white outline message icon. No green color.
+  Hover tooltip: "Chat with us on WhatsApp".
+  Links to WhatsApp with pre-filled message: "Hi! I need help with my order on
+  Lowkey Wardrobe."
+
+---
+
+### C.4 — ORDER TRACKING PAGE
+
+- Create a public page at route /track-order. Link from footer and order confirmation.
+- UI: centered layout. Heading "Track Your Order" in serif italic. A single input field
+  "Enter your Order ID (e.g. LKW-XXXXXX)" and a TRACK button.
+- On submit: look up the order. Display a visual order timeline — 4 stages as connected
+  horizontal nodes: ORDER CONFIRMED → PROCESSING → DISPATCHED → DELIVERED.
+  Completed stages: filled black. Current stage: active/highlighted. Future: light grey.
+- Below timeline: Order ID, customer name, order date, items (thumbnail + name + qty),
+  estimated delivery.
+- If order not found: "No order found with this ID. Please check and try again."
+- No login required.
+
+---
+
+### C.5 — USER ACCOUNTS & ORDER HISTORY
+
+- Full auth flow: Sign Up, Login, Forgot Password, Reset Password.
+- My Account page with sections:
+    Profile: Edit name, email, phone number, password
+    Addresses: Save multiple delivery addresses, set default
+    Orders: Full order history — Order ID, date, items, total, status, View Details link
+    Wishlist: Account-synced wishlist
+    Preferences: Newsletter subscription toggle
+- Account nav icon dropdown when logged in: My Account / Orders / Wishlist / Logout.
+  When logged out: Login / Sign Up.
+- All account pages follow the same B&W minimal aesthetic. Serif italic section headings.
+
+---
+
+### C.6 — PROMO CODE / DISCOUNT SYSTEM
+
+- Promo code input at cart and checkout. Label: "HAVE A PROMO CODE?" with text input
+  and APPLY button.
+- Discount types: percentage off / fixed PKR amount off / free shipping.
+  Each code has: minimum order requirement, expiry date, usage limit.
+- Admin: Promo Codes section under Site Settings — create, set expiry, usage limits,
+  toggle active/inactive.
+- Valid code applied: discount line shown in order summary.
+- Invalid code: inline error "This code is invalid or expired."
+
+---
+
+### C.7 — PRODUCT REVIEWS & RATINGS
+
+- Reviews section on every product detail page, below "Complete the Look".
+- Show: average star rating (thin outline stars, black filled), total count,
+  rating breakdown bar chart (5★ through 1★, horizontal thin bars).
+- Individual reviews: reviewer name, star rating, date, review text, optional photo.
+- "Write a Review" form (visible only to logged-in users who purchased the product):
+  clickable star rating selector, review title, review body, optional photo upload.
+  Submit button: SUBMIT REVIEW.
+- Admin: approve/hide reviews per product. Only approved reviews show publicly.
+
+---
+
+### C.8 — WISHLIST WITH SHARING
+
+- Wishlist fully functional: add/remove from product cards (heart icon) and product
+  detail page.
+- Logged-in users: wishlist syncs to account. Guests: stored in localStorage.
+- Dedicated /wishlist page: product grid, heading "Your Wishlist" in serif italic.
+  Each item: image, name, price, size selector, ADD TO BAG button, remove (×) icon.
+- "Share Wishlist" button at top of wishlist page for logged-in users — generates a
+  unique shareable URL (/wishlist/[token]) that anyone can view read-only.
+  Button label: "SHARE WISHLIST →"
+
+---
+
+### C.9 — ADVANCED FILTERING & SORTING ON COLLECTION PAGES
+
+- Filter sidebar on all collection pages (desktop: left sidebar, mobile: bottom drawer):
+    Category checkboxes
+    Gender radio: Menswear / Womenswear / Unisex / All
+    Size checkboxes: S/M/L/XL/XXL for clothing; 39–44 for shoes
+    Color swatches: Black / White / Grey / Brown / Beige
+    Price range slider: PKR 0 – PKR 100,000
+    Availability toggle: In Stock Only
+- Sort by dropdown: Newest / Price Low–High / Price High–Low / Best Selling / Most Reviewed
+- Active filter pills below filter bar, each with × to remove. "Clear All" link on right.
+- "Showing X products" count updates dynamically as filters apply.
+- Filters update URL as query params (e.g. ?size=M&color=black) — shareable and persistent.
+
+---
+
+### C.10 — STOCK ALERTS — "NOTIFY ME" FEATURE
+
+- On sold-out products: replace ADD TO BAG with "NOTIFY WHEN BACK IN STOCK" button.
+- Click shows inline form: email input + NOTIFY ME submit. Confirmation message shown.
+- Store notification requests in database: product ID + email + size.
+- Admin: per-product, show count of waitlisted users + their email list.
+- When admin updates stock from 0 to available: trigger automatic email to all waitlisted
+  users with direct product page link.
+
+---
+
+### C.11 — GIFT WRAPPING AT CHECKOUT
+
+- Gift wrapping option during checkout before payment step.
+- UI: card with thin gift box icon, heading "Add Gift Wrapping?", description:
+  "Beautifully packaged in our signature black gift box with ribbon and personalised card."
+- Options:
+    Standard Gift Wrap: Free
+    Premium Gift Wrap with personalised card: PKR 500 (configurable in admin)
+- When selected: text area for personalised message (max 150 chars).
+- Admin order view: shows gift wrapping type, the personalised message. Flag prominently.
+
+---
+
+### C.12 — LOOKBOOK / EDITORIAL PAGE
+
+- New page at route /lookbook. Add to navigation.
+- Pure editorial photography page — full-width images, no prices visible.
+- Layout: alternating full-width and 50/50 split editorial image sections.
+  Optional minimal text overlay per section: collection name + season.
+- Clickable product tags on images: small white circular dots positioned on image.
+  On click: tooltip showing product thumbnail, name, price, "SHOP NOW →" link.
+- Admin: Lookbook Manager under Site Settings — upload images, click to place product
+  tag dots, assign products to each dot.
+- Page heading: "The Edit" in large serif italic. Subheading: season name in small caps.
+
+---
+
+### C.13 — LOYALTY / POINTS PROGRAM ("LKW POINTS")
+
+- Earning rules (configurable in admin):
+    1 point per PKR 100 spent
+    50 bonus points on account sign-up
+    25 bonus points for leaving a product review
+- Redemption: 100 points = PKR 100 off.
+- My Account page: LKW Points section showing balance, PKR equivalent, points history.
+- Checkout: if user has redeemable points, show toggle "Use LKW Points — X points =
+  PKR Y off". Toggle to apply/remove.
+- Admin: Loyalty section — total points issued, redeemed, top holders.
+- Account dropdown in nav: small points badge showing current balance (e.g. ★ 450 pts).
+
+---
+
+### C.14 — ABANDONED CART RECOVERY
+
+- Track when a logged-in user adds to cart but doesn't complete checkout.
+- After 1.5 hours of cart inactivity, trigger:
+    Email: Subject "You left something behind, [Name]" — product thumbnails, names,
+    prices, COMPLETE YOUR ORDER button. Optional 10% one-time discount code (24hr expiry).
+    WhatsApp (if user provided number): short message with cart summary + link + code.
+- Admin: Abandoned Carts section — user, items, cart value, time abandoned, recovery status.
+- Do NOT send recovery messages to guest users.
+
+---
+
+### C.15 — INSTAGRAM FEED SECTION
+
+- New section on homepage below Trust Signals, above footer.
+- Heading: "AS WORN" in serif italic, centered. Subheading: "@lowkeywardrobe" in small caps
+  with follow link.
+- Grid of 6–8 square Instagram post images. On hover: dark overlay with "VIEW POST →".
+- Implementation: allow admin to upload 8 square images in Site Settings > Instagram Feed,
+  each with a link to the Instagram post URL. Clicking opens post in new tab.
+- CSS: images use filter: grayscale(100%) by default. On hover, grayscale removes to show
+  full color. This keeps the B&W theme while making hover feel rewarding.
+
+---
+
+### C.16 — SEO & STRUCTURED DATA
+
+- Add JSON-LD structured data to every product page (schema type: Product — name,
+  description, image, brand, offers: price PKR, availability, URL).
+- Unique meta title + description for all pages:
+    Homepage: "Lowkey Wardrobe — Luxury Pakistani Fashion | Clothing, Shoes & Accessories"
+    Product pages: "[Product Name] — PKR [Price] | Lowkey Wardrobe"
+    Collection pages: "[Category] Collection — Lowkey Wardrobe"
+- Open Graph tags on all pages (og:title, og:description, og:image, og:url) for proper
+  WhatsApp, Instagram, and Facebook sharing previews.
+- Auto-generated sitemap.xml and a robots.txt file.
+- Descriptive alt tags on all product images (product name + brand).
+- Canonical URLs on all pages.
+
+---
+
+## ═══════════════════════════════════════
+## SECTION D — GENERAL IMPLEMENTATION RULES
+## ═══════════════════════════════════════
+
+- All new UI components must strictly follow the B&W design system:
+  black (#000000), white (#FFFFFF), and shades of grey only. No color whatsoever.
+
+- All new typography must use the font system defined in Section A above.
+
+- All hover transitions: 200–400ms ease-in-out. Never instant, never sluggish.
+
+- All new modals: dark backdrop overlay, white content panel, fade-in animation,
+  close on backdrop click, close on × button, close on Escape key press.
+
+- All new forms: proper inline validation, error messages, loading state on submit
+  button (spinner or "..." text), success confirmation state after submit.
+
+- Mobile responsiveness is mandatory for every new component. Test at 375px viewport.
+  Modals stack vertically, filter sidebar becomes bottom drawer, columns collapse to one.
+
+- Maintain existing animation style (fade transitions, clean) — no bounce, no color
+  flashes, no jarring motion.
+
+- Admin dashboard: every new feature gets a corresponding management section in the admin.
+  Follow existing admin design (black sidebar, white content area, clean tables).
+
+---
+END OF MASTER PROMPT
