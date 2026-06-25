@@ -446,7 +446,7 @@ export default function ProductDetail() {
           </h2>
           <div className="flex gap-[2px] overflow-x-auto no-scrollbar bg-[#EAEAEA] border border-[#EAEAEA]">
             {recentlyViewed.slice(0, 4).map(p => (
-              <div key={p.id} className="bg-white min-w-[260px] flex-shrink-0"><ProductCard product={p as any} /></div>
+              <div key={p.id} className="bg-white w-[260px] min-w-[260px] flex-shrink-0 flex-grow-0"><ProductCard product={p as any} /></div>
             ))}
           </div>
         </section>
