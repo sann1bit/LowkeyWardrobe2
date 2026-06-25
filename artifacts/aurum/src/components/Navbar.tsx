@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { useLocation } from 'wouter';
 import { Search, Heart, ShoppingBag, User, ChevronDown } from 'lucide-react';
 import { useCartStore } from '../stores/cartStore';
 import { useWishlistStore } from '../stores/wishlistStore';
@@ -34,6 +34,7 @@ const MEGA_MENUS: Record<string, { label: string; href: string }[]> = {
 };
 
 export function Navbar() {
+  const [, navigate] = useLocation();
   const { openCart, itemCount } = useCartStore();
   const { count: wishlistCount } = useWishlistStore();
   const { openSearch } = useUIStore();
@@ -56,6 +57,12 @@ export function Navbar() {
     megaTimeout.current = setTimeout(() => setMegaOpen(null), 120);
   };
 
+  const go = (href: string) => {
+    setMegaOpen(null);
+    setMobileOpen(false);
+    navigate(href);
+  };
+
   const navLinks = [
     { label: 'New Arrivals', href: '/products?category=new' },
     { label: 'Clothing', href: '/products?category=clothing', mega: 'Clothing' },
@@ -71,11 +78,13 @@ export function Navbar() {
       }`}>
         <div className="h-full px-8 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/">
-            <div style={{ fontFamily: 'var(--font-smallcaps)' }} className="text-[14px] font-medium tracking-[0.28em] cursor-pointer uppercase text-black">
-              Lowkey Wardrobe
-            </div>
-          </Link>
+          <div
+            style={{ fontFamily: 'var(--font-smallcaps)' }}
+            className="text-[14px] font-medium tracking-[0.28em] cursor-pointer uppercase text-black hover:opacity-70 transition-opacity"
+            onClick={() => go('/')}
+          >
+            Lowkey Wardrobe
+          </div>
 
           {/* Center Links — desktop */}
           <div className="hidden md:flex items-center gap-9 absolute left-1/2 -translate-x-1/2">
@@ -86,13 +95,15 @@ export function Navbar() {
                 onMouseEnter={() => link.mega ? openMega(link.mega) : undefined}
                 onMouseLeave={link.mega ? closeMega : undefined}
               >
-                <Link href={link.href}>
-                  <div style={{ fontFamily: 'var(--font-body)' }} className={`flex items-center gap-1 text-[11px] font-[500] tracking-[0.15em] uppercase hover:opacity-70 transition-opacity cursor-pointer relative group ${link.sale ? 'font-[600]' : ''}`}>
-                    {link.label}
-                    {link.mega && <ChevronDown size={10} strokeWidth={2} className="opacity-40" />}
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full" />
-                  </div>
-                </Link>
+                <div
+                  style={{ fontFamily: 'var(--font-body)' }}
+                  className={`flex items-center gap-1 text-[11px] font-[500] tracking-[0.15em] uppercase hover:opacity-70 transition-opacity cursor-pointer relative group ${link.sale ? 'font-[600]' : ''}`}
+                  onClick={() => go(link.href)}
+                >
+                  {link.label}
+                  {link.mega && <ChevronDown size={10} strokeWidth={2} className="opacity-40" />}
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full" />
+                </div>
 
                 {/* Mega dropdown */}
                 {link.mega && megaOpen === link.mega && (
@@ -103,14 +114,14 @@ export function Navbar() {
                   >
                     <div className="flex flex-col gap-3">
                       {MEGA_MENUS[link.mega].map(item => (
-                        <Link key={item.label} href={item.href}>
-                          <span
-                            style={{ fontFamily: 'var(--font-smallcaps)' }}
-                            className="block text-[11px] tracking-[0.18em] uppercase text-black/70 hover:text-black transition-colors cursor-pointer"
-                          >
-                            {item.label}
-                          </span>
-                        </Link>
+                        <div
+                          key={item.label}
+                          onClick={() => go(item.href)}
+                          style={{ fontFamily: 'var(--font-smallcaps)' }}
+                          className="block text-[11px] tracking-[0.18em] uppercase text-black/70 hover:text-black transition-colors cursor-pointer"
+                        >
+                          {item.label}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -125,16 +136,17 @@ export function Navbar() {
               <Search size={18} strokeWidth={1.5} />
             </button>
 
-            <Link href="/wishlist">
-              <div className="relative hover:opacity-60 transition-opacity cursor-pointer flex items-center gap-1">
-                <Heart size={18} strokeWidth={1.5} />
-                {wishlistCount() > 0 && (
-                  <span className="absolute -top-1.5 -right-2 w-4 h-4 bg-black text-white text-[9px] flex items-center justify-center rounded-full">
-                    {wishlistCount()}
-                  </span>
-                )}
-              </div>
-            </Link>
+            <div
+              className="relative hover:opacity-60 transition-opacity cursor-pointer flex items-center gap-1"
+              onClick={() => go('/wishlist')}
+            >
+              <Heart size={18} strokeWidth={1.5} />
+              {wishlistCount() > 0 && (
+                <span className="absolute -top-1.5 -right-2 w-4 h-4 bg-black text-white text-[9px] flex items-center justify-center rounded-full">
+                  {wishlistCount()}
+                </span>
+              )}
+            </div>
 
             <button onClick={openCart} className="relative hover:opacity-60 transition-opacity">
               <ShoppingBag size={18} strokeWidth={1.5} />
@@ -145,11 +157,12 @@ export function Navbar() {
               )}
             </button>
 
-            <Link href="/admin">
-              <div className="hidden md:flex hover:opacity-60 transition-opacity cursor-pointer">
-                <User size={18} strokeWidth={1.5} />
-              </div>
-            </Link>
+            <div
+              className="hidden md:flex hover:opacity-60 transition-opacity cursor-pointer"
+              onClick={() => go('/admin')}
+            >
+              <User size={18} strokeWidth={1.5} />
+            </div>
 
             {/* Mobile menu button */}
             <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -168,18 +181,23 @@ export function Navbar() {
         <div className="fixed top-[64px] left-0 right-0 bg-white border-b border-[#EAEAEA] z-[999] px-8 py-6 md:hidden">
           <nav className="flex flex-col gap-5">
             {navLinks.map(link => (
-              <Link key={link.label} href={link.href}>
-                <div onClick={() => setMobileOpen(false)} style={{ fontFamily: 'var(--font-body)' }} className={`text-[12px] uppercase tracking-[0.15em] font-[500] ${link.sale ? 'font-[600]' : ''}`}>
-                  {link.label}
-                </div>
-              </Link>
+              <div
+                key={link.label}
+                onClick={() => go(link.href)}
+                style={{ fontFamily: 'var(--font-body)' }}
+                className={`text-[12px] uppercase tracking-[0.15em] font-[500] cursor-pointer ${link.sale ? 'font-[600]' : ''}`}
+              >
+                {link.label}
+              </div>
             ))}
             <div className="border-t border-[#EAEAEA] pt-4">
-              <Link href="/admin">
-                <div onClick={() => setMobileOpen(false)} style={{ fontFamily: 'var(--font-body)' }} className="text-[12px] uppercase tracking-[0.15em] text-[#999999]">
-                  Admin
-                </div>
-              </Link>
+              <div
+                onClick={() => go('/admin')}
+                style={{ fontFamily: 'var(--font-body)' }}
+                className="text-[12px] uppercase tracking-[0.15em] text-[#999999] cursor-pointer"
+              >
+                Admin
+              </div>
             </div>
           </nav>
         </div>

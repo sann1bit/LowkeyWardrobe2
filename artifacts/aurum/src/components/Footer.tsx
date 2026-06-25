@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { useLocation } from 'wouter';
 import { useState, useEffect } from 'react';
 
 function InstagramIcon() {
@@ -58,6 +58,18 @@ function BackToTop() {
 }
 
 export function Footer() {
+  const [, navigate] = useLocation();
+
+  const go = (href: string) => navigate(href);
+
+  const quickLinks = [
+    { label: 'New Arrivals', href: '/products?category=new' },
+    { label: 'Clothing', href: '/products?category=clothing' },
+    { label: 'Shoes', href: '/products?category=shoes' },
+    { label: 'Accessories', href: '/products?category=accessories' },
+    { label: 'Sale', href: '/products?category=sale' },
+  ];
+
   return (
     <>
       <BackToTop />
@@ -99,14 +111,16 @@ export function Footer() {
             <div>
               <h4 style={{ fontFamily: 'var(--font-smallcaps)' }} className="text-[12px] tracking-[0.2em] uppercase mb-6 text-white/40 font-[500]">Quick Links</h4>
               <ul className="flex flex-col gap-3">
-                {[
-                  { label: 'New Arrivals', href: '/products?category=new' },
-                  { label: 'Clothing', href: '/products?category=clothing' },
-                  { label: 'Shoes', href: '/products?category=shoes' },
-                  { label: 'Accessories', href: '/products?category=accessories' },
-                  { label: 'Sale', href: '/products?category=sale' },
-                ].map(l => (
-                  <li key={l.label}><Link href={l.href}><span style={{ fontFamily: 'var(--font-body)' }} className="text-[12px] text-white/60 font-light hover:text-white transition-colors cursor-pointer leading-[2.2] tracking-[0.08em]">{l.label}</span></Link></li>
+                {quickLinks.map(l => (
+                  <li key={l.label}>
+                    <span
+                      onClick={() => go(l.href)}
+                      style={{ fontFamily: 'var(--font-body)' }}
+                      className="text-[12px] text-white/60 font-light hover:text-white transition-colors cursor-pointer leading-[2.2] tracking-[0.08em]"
+                    >
+                      {l.label}
+                    </span>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -114,9 +128,27 @@ export function Footer() {
             <div>
               <h4 style={{ fontFamily: 'var(--font-smallcaps)' }} className="text-[12px] tracking-[0.2em] uppercase mb-6 text-white/40 font-[500]">Customer Care</h4>
               <ul className="flex flex-col gap-3">
-                {['Contact Us', 'Size Guide', 'Shipping Info', 'Returns', 'Track Order'].map(l => (
-                  <li key={l}>
-                    <a href={l === 'Track Order' ? '/track-order' : '#'} style={{ fontFamily: 'var(--font-body)' }} className="text-[12px] text-white/60 font-light hover:text-white transition-colors leading-[2.2] tracking-[0.08em]">{l}</a>
+                {[
+                  { label: 'Contact Us', href: null },
+                  { label: 'Size Guide', href: null },
+                  { label: 'Shipping Info', href: null },
+                  { label: 'Returns', href: null },
+                  { label: 'Track Order', href: '/track-order' },
+                ].map(l => (
+                  <li key={l.label}>
+                    {l.href ? (
+                      <span
+                        onClick={() => go(l.href!)}
+                        style={{ fontFamily: 'var(--font-body)' }}
+                        className="text-[12px] text-white/60 font-light hover:text-white transition-colors cursor-pointer leading-[2.2] tracking-[0.08em]"
+                      >
+                        {l.label}
+                      </span>
+                    ) : (
+                      <span style={{ fontFamily: 'var(--font-body)' }} className="text-[12px] text-white/60 font-light leading-[2.2] tracking-[0.08em]">
+                        {l.label}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -138,8 +170,8 @@ export function Footer() {
               &copy; 2026 Lowkey Wardrobe. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" style={{ fontFamily: 'var(--font-body)' }} className="text-[11px] text-white/40 hover:text-white tracking-[0.1em] uppercase transition-colors">Privacy Policy</a>
-              <a href="#" style={{ fontFamily: 'var(--font-body)' }} className="text-[11px] text-white/40 hover:text-white tracking-[0.1em] uppercase transition-colors">Terms of Service</a>
+              <span style={{ fontFamily: 'var(--font-body)' }} className="text-[11px] text-white/40 tracking-[0.1em] uppercase">Privacy Policy</span>
+              <span style={{ fontFamily: 'var(--font-body)' }} className="text-[11px] text-white/40 tracking-[0.1em] uppercase">Terms of Service</span>
             </div>
           </div>
         </div>

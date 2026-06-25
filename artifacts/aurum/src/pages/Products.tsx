@@ -5,7 +5,24 @@ import { ProductCard } from '../components/ProductCard';
 import { ProductCardSkeleton } from '../components/ProductCardSkeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, ChevronDown, Search, X } from 'lucide-react';
-import { useLocation, useSearch } from 'wouter';
+
+// Custom hook: listens to native pushState/replaceState/popstate events that
+// Wouter patches — more reliable than useSyncExternalStore for category sync.
+function useLiveSearch(): string {
+  const [search, setSearch] = useState(() => window.location.search);
+  useEffect(() => {
+    const update = () => setSearch(window.location.search);
+    window.addEventListener('popstate', update);
+    window.addEventListener('pushState', update);
+    window.addEventListener('replaceState', update);
+    return () => {
+      window.removeEventListener('popstate', update);
+      window.removeEventListener('pushState', update);
+      window.removeEventListener('replaceState', update);
+    };
+  }, []);
+  return search;
+}
 
 const SUBCATEGORIES: Record<string, { id: string; label: string }[]> = {
   clothing: [
@@ -29,7 +46,7 @@ const SUBCATEGORIES: Record<string, { id: string; label: string }[]> = {
 };
 
 export default function Products() {
-  const search = useSearch();   // updates on every navigation, including same-pathname query changes
+  const search = useLiveSearch();
   const [activeCategory, setActiveCategory] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('category') || 'all';
